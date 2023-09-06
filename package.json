@@ -1,0 +1,26 @@
+{
+  "name": "interview-blog",
+  "version": "1.0.0",
+  "description": ">不忘初心，逢考必过。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yukiyukixing/interview-blog.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yukiyukixing/interview-blog/issues"
+  },
+  "homepage": "https://github.com/yukiyukixing/interview-blog#readme",
+  "devDependencies": {
+    "vuepress": "^1.9.10"
+  }
+}
