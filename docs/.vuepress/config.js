@@ -43,7 +43,17 @@ module.exports = {
             {
                 title: '基础知识',
                 path: '/基础知识',
-                children: ['/base/JS', '/base/CSS'],
+                children: [
+                    '/base/JS',
+                    '/base/CSS',
+                    '/base/浏览器',
+                    '/base/React',
+                    '/base/前端工程化',
+                    '/base/计算机原理',
+                    '/base/可视化',
+                    '/base/微前端',
+                    '/base/算法',
+                ],
                 collapsable: true,
                 // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },

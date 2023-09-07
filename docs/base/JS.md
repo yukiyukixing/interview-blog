@@ -1,12 +1,16 @@
-# JS##
+# 1.JS
 
-## 1.for in 和 for of 的区别（✔被问到概率很高）
+## 1.for in 和 for of 的区别（✔被问到概率很高）⭐ 
 
 - 1.for...in遍历的是key，而for...of遍历的是value
 
 - 2.for...in可以遍历普通对象，而for...of只能遍历可迭代类型对象
 
 - 3.for...in遍历对象的时候会遍历对象原型链上面的属性。
+
+- 4.for...in一般被用来遍历对象，for...of一般被用来遍历数组。
+
+>tips：hasOwnProperty()方法可以判断属性是否是属于对象本身，属于的话为true，不属于为false。
 
 ## 2.ES6有哪些新属性？
 
@@ -30,7 +34,102 @@
 
 - 10.Proxy
 
-## 3.箭头函数和普通函数的区别？
+## 3.let、var、const的区别
+    
+1.let不能重复定义变量，而var可以
+
+2.var存在变量提升，可在声明前使用变量，而let由于存在暂时性死区不能在声明变量前使用
+
+3.var声明的变量会挂载到window下面，而let不会挂到window下面，而是形成一个块级作用域。
+
+4.const定义的是常量，定义之后就不可更改，而且初始化的时候必须赋值，其他和let一样。
+
+## 4.promise
+
+1、概念：Promise 对象用于表示一个异步操作的最终完成 (或失败)及其结果值。
+
+2、状态：大致分为三种状态。
+
+①：pending：未决定的
+
+②、resolved / fullfilled：成功
+
+③、rejected：失败
+
+3、解决了什么问题？
+
+①、支持链式调用，解决了回掉地狱的问题。
+
+## 5.手写一个Promise.all ⭐
+
+手写一个Promise.all的步骤：
+
+- 1.创建一个新的 Promise: 在 promiseAll 函数中返回一个新的 Promise 对象。
+
+- 2.初始化结果数组和计数器: 创建一个数组来存储每个 Promise 的结果，并初始化一个计数器来追踪已完成的 Promise 的数量。
+
+- 3.处理空数组: 如果输入的数组为空，直接返回一个 resolve 状态的 Promise。
+
+- 4.遍历 Promise 数组: 对输入的 Promise 数组进行遍历。
+
+- 5.处理单个 Promise: 对每个 Promise 使用 Promise.resolve 包裹，以确保非 Promise 对象也能被正确处理。
+
+- 6.成功状态（Fulfilled）: 当一个 Promise 完成（fulfilled）时，将其结果存储在结果数组的相应位置，并增加计数器。
+
+- 7.检查是否全部完成: 在每个单个 Promise 完成后，检查所有的 Promise 是否都已完成。如果是，则将 Promise.all 返回的 Promise 置为 fulfilled 状态，并传递结果数组。
+
+- 8.失败状态（Rejected）: 如果任何一个 Promise 失败（rejected），则立即使整个 Promise.all 返回的 Promise 转为 rejected 状态，并传递失败的原因。
+
+```js
+function promiseAll(promiseArr) {
+    return new Promise((resolve, reject) => {
+        const res = []
+        let completed = 0
+        const len = promiseArr.length
+        for (let i = 0; i < len; i++) {
+            Promise.resolve(promiseArr[i]).then(val => {
+                res[i] = val
+                completed++
+                if (completed === len) {
+                    resolve(res)
+                }
+            }).catch(error => {
+                reject(error)
+            })
+        }
+    })
+}
+```
+
+## 6.手写一个Promise.race
+
+手写一个Promise.race的步骤：
+
+- 1.创建一个新的 Promise: 在 promiseRace 函数内部，返回一个新的 Promise 对象。
+
+- 2.空数组处理: 如果输入的 Promise 数组为空，可以返回一个永远不会 settle（即不会 fulfilled 或 rejected）的 Promise，以符合原生 Promise.race 的行为。
+
+- 3.遍历 Promise 数组: 对输入的 Promise 数组进行遍历。
+
+- 4.单个 Promise 处理: 使用 Promise.resolve 方法包裹每一个 Promise（或可能不是 Promise 的对象），以确保它们都是 Promise 对象。
+
+- 5.成功状态（Fulfilled）: 如果其中一个 Promise 完成（fulfilled），则立即将 Promise.race 返回的 Promise 的状态设为 fulfilled，并返回该 Promise 的结果。
+
+- 6.失败状态（Rejected）: 如果其中一个 Promise 失败（rejected），则立即将 Promise.race 返回的 Promise 的状态设为 rejected，并返回该 Promise 的失败原因。
+
+```js
+function promiseRace(promiseArr) {
+    return new Promise((resolve, reject) => {
+        const len = promiseArr.length
+        if (len === 0) return
+        for (let i = 0; i < len; i++) {
+            Promise.resolve(promiseArr[i]).then(resolve, reject)
+        }
+    })
+}
+```
+
+## 7.箭头函数和普通函数的区别？ ⭐
     
 - 1.箭头函数没有自己的this，this来自于执行上下文。
 
@@ -38,13 +137,13 @@
 
 - 3.箭头函数没有arguments，不能使用arguments取函数的参数。
 
-## 4.JS数据类型？
+## 8.JS数据类型？
     
 - 1.原始类型：number、boolean、null、undefined、string、Symbol、BigInt
 
 - 2.引用类型：Object
 
-## 5.Map和Object的区别
+## 9.Map和Object的区别
 
 [Map](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map)：
 
@@ -68,14 +167,13 @@
 
 - 3.查找操作，如果代码涉及到大量的查找操作，那么可能Object性能会更优一点。
     
-    
-## 6.Map和Set
+## 10.Map和Set
    
 **Map**: 存储键-值对。键可以是任何类型（包括对象、函数等）。
     
-**[Se](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set)t**: 存储唯一值，不允许重复。值可以是任何类型。
+**[Set](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set)**: 存储唯一值，不允许重复。值可以是任何类型。
     
-## 7.Map和WeakMap，WeakMap和WeakSet
+## 11.Map和WeakMap，WeakMap和WeakSet
     
 **Map**:
 
@@ -93,7 +191,7 @@
     
 **WeakSet**: 存储唯一对象值。
     
-## 8.WeakMap用于哪些场景下
+## 12.WeakMap用于哪些场景下
     
 - 1.缓存和记忆化：WeakMap 可用于缓存已经计算过的结果，以便将来快速检索。由于它是弱引用的，所以当对象不再需要时，它们可以被垃圾收集。
     
@@ -124,9 +222,7 @@
         });
 ```
 
-
-    
-## 9.深拷贝，浅拷贝
+## 13.深拷贝，浅拷贝 ⭐
     
 - 1.深浅拷贝是针对引用类型说的，原始类型不存在深浅拷贝。
 
@@ -181,7 +277,7 @@
         console.log(deepCopy(obj));
 ```
       
-## 10.浏览器事件机制？
+## 14.浏览器事件机制？
     
 - 1.事件委托基于事件冒泡的原理，允许我们不直接绑定事件处理程序到每个单独的元素，而是绑定到一个共同的父元素。当该父元素的子元素触发了特定的事件时，事件处理程序会被执行。
 
@@ -191,27 +287,27 @@
   
 - 2.动态元素: 对于在后期通过JavaScript动态添加到DOM的元素，你不需要为它们单独绑定事件。因为它们自然会继承父元素的事件处理。
 
-## 7.防抖、节流
+## 15.防抖、节流 ⭐
 
-- 1.防抖：当你使用防抖时，如果连续触发函数，它会延迟执行直到一段时间没有再次触发。也就是说只有在你停止触发函数一段时间后，函数才会执行。
+- 1.防抖：函数被触发n秒之后再执行，如果在这n秒内函数被再次触发，则重新计时。
 
 应用场景:
     
-- 搜索框文本输入。当用户停止输入后，才发送请求进行搜索。
-- 窗口调整大小。当用户停止调整窗口大小时，才重新计算布局。
+- 搜索框文本输入。当用户停止输入一段时间后，才发送请求进行搜索。
+- 窗口调整大小。当用户停止调整窗口大小一段时间后，才重新计算布局。(注：这个场景根据需求来，使用防抖和节流理论上都是可以的，看你的需求是什么。)
 
 ```js
-        function debounce(fn, delay) {
-            let timer;
-            return function () {
-                if (timer) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout((...args) => {
-                    fn.apply(this, args);
-                }, delay)
-            }
-        }  
+function debounce(fn, delay) {
+    let timer;
+    return function () {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout((...args) => {
+            fn.apply(this, args);
+        }, delay)
+    }
+}
 ```
     
 - 2.节流：节流确保一个函数在指定的时间间隔内只执行一次，即使在这段时间内触发多次。
@@ -219,21 +315,19 @@
 应用场景:
     
 - 滚动事件。例如，在用户滚动时定期检查页面的位置，而不是每次滚动都检查。
-
+- 窗口调整大小。间隔一段时间更新一次，让你在调整的过程中能看到布局的变化。
 
 ```js
-        function throttle(fn, delay) {
-            let timer;
-            return function () {
-                if (timer) {
-                    return
-                }
-                timer = setTimeout((...args) => {
-                    fn.apply(this, args);
-                    timer = null;
-                }, delay);
-            }
+function throttle(fn, delay) {
+    let lastCall = 0
+    return function (...args) {
+        const now = new Date().getTime()
+        if (now - lastCall >= delay) {
+            lastCall = now
+            return fn.apply(this,args)
         }
+    }
+}
 ```
 
 区别：
@@ -241,7 +335,7 @@
 -  防抖: 保证在一系列连续的函数触发后，只执行一次。
 -  节流: 保证在一段时间内，函数只执行一次。
 
-## 8.重绘、重排的区别？
+## 16.重绘、重排的区别？
 
 - 1.重绘不会导致页面重新渲染。
 
@@ -253,16 +347,21 @@
 
 - 2.导致重排的操作，添加/删除可见的dom元素，改变元素位置，改变浏览器窗口尺寸等等，display，padding，margin，postion等等。
 
-- 3.重排优化：1.不要频繁操作样式。2.使用absolute和fixed脱离正常文档流 3.优化动画，可以把动画加在使用absolute和fixed的元素上。
+- 3.重排优化：
 
+1.不要频繁操作样式。
 
-## 9.展开语法和解构语法
+2.使用absolute和fixed脱离正常文档流 
+
+3.优化动画，可以把动画加在使用absolute和fixed的元素上。
+
+## 17.展开语法和解构语法
 
 展开语法：主要用于“展开”数组或对象。
  
 解构赋值：主要用于从数组或对象中“提取”值或属性，并赋值给新的变量。
 
-## 10.export default和export的区别？
+## 18.export default和export的区别？
 
 - 1.export可以直接导出表达式，而export default不行。
 
@@ -270,53 +369,201 @@
 
 - 3.在一个文件模块中，export可以有多个，而export default只有一个。
 
-## 11.let、var、const的区别
-    
-1.let不能重复定义变量，而var可以
+## 19.闭包
 
-2.var存在变量提升，可在声明前使用变量，而let由于存在暂时性死区不能在声明变量前使用
+- 1.定义：函数和与其相关的引用环境的组合就是闭包。
 
-3.var声明的变量会挂载到window下面，而let不会挂到window下面，而是形成一个块级作用域。
+- 2.创建：当一个内部函数在一个外部函数里被定义，并且内部函数引用了外部函数的变量或参数，那么闭包就被创建了。
 
-4.const定义的是常量，定义之后就不可更改，而且初始化的时候必须赋值，其他和let一样。
+- 3.不会被垃圾回收：在外部函数执行完毕之后，内部函数中引用的变量或参数不会被回收。
 
-## 12.闭包
-    
-闭包的作用，可以访问函数内部变量，可以让变量一直存在于内存中不被回收。
+- 4.闭包的作用：
 
-## 13.事件循环（Event Loop）
-    
-首先，因为JS是单线程执行的，所以它一次只能执行一个任务。然后就有了事件循环，事件循环是JS在浏览器和Node中用来处理异步操作的机制。
-    
-主线程首先执行所有的同步代码。当同步代码执行完成后，它会查看任务队列以查找有无等待的回调函数。如果任务队列中有回调函数，主线程会从队列中取出并执行它。这个过程是循环的，因此称为“事件循环”。
+- 数据封装和私有变量：闭包可以用来模拟私有变量，提供公开的API而隐藏内部实现细节。
 
-## 14.说一下ES6中的Proxy？
+```js
+function createCounter() {
+  let count = 0; // 私有变量
+
+  return {
+    increment: function() {
+      count++;
+      return count;
+    },
+    decrement: function() {
+      count--;
+      return count;
+    },
+    getCount: function() {
+      return count;
+    }
+  };
+}
+
+const counter = createCounter(); // 创建一个新的计数器
+
+console.log(counter.getCount()); // 输出 0，通过API获取count的值
+counter.increment(); // 通过API增加count
+console.log(counter.getCount()); // 输出 1
+counter.decrement(); // 通过API减少count
+console.log(counter.getCount()); // 输出 0
+
+console.log(counter.count); // 输出 undefined，因为count是私有变量，无法直接访问
+```
+
+>在这个例子中，createCounter 函数返回一个包含三个方法的对象（increment, decrement, 和 getCount）。这些方法都有权访问createCounter 的局部变量count，但是从外部是无法直接访问 count 的。这样，count 就成了一个私有变量，只能通过提供的API来进行操作。
+
+>这种方式提供了一种封装内部实现细节的机制，你可以自由地改变内部的实现而不影响到外部代码，增加了代码的可维护性和安全性。
+
+- 动态生成函数：根据不同的参数或条件生成具有特定行为的函数。
+
+```js
+function greeting(language) {
+  return function(name) {
+    if (language === 'English') {
+      return `Hello, ${name}!`;
+    }
+    if (language === 'Spanish') {
+      return `Hola, ${name}!`;
+    }
+    if (language === 'Chinese') {
+      return `你好, ${name}！`;
+    }
+    return `Hi, ${name}!`;
+  };
+}
+
+const greetInEnglish = greeting('English');
+const greetInSpanish = greeting('Spanish');
+const greetInChinese = greeting('Chinese');
+
+console.log(greetInEnglish('John')); // 输出 "Hello, John!"
+console.log(greetInSpanish('Juan')); // 输出 "Hola, Juan!"
+console.log(greetInChinese('张三')); // 输出 "你好, 张三！"
+```
+
+>在这个例子中，greeting 函数接收一个language 参数，并返回一个新的函数。这个新函数根据传入的language 参数来决定如何生成问候语。
+
+>返回的函数（闭包）有权访问greeting 函数的language 参数，即使greeting 函数的执行上下文已经被销毁。这就是闭包的魔力所在。
+
+>通过这样的方式，你可以创建一个非常灵活和可配置的函数，用于处理各种不同的场景和需求。
+
+- 函数柯里化：使用闭包逐步传递少量参数。
+
+```js
+// 普通的加法函数
+function add(a, b) {
+  return a + b;
+}
+
+// 柯里化的加法函数
+function curriedAdd(a) {
+  return function(b) {
+    return a + b;
+  };
+}
+
+// 使用
+const addFive = curriedAdd(5); // 此时，addFive 是一个闭包，保存了 a 的值为 5
+console.log(addFive(3)); // 输出 8（5 + 3）
+console.log(addFive(4)); // 输出 9（5 + 4）
+```
+
+>在上面的例子中，curriedAdd 函数接受一个参数 a，然后返回一个新的函数，这个新函数期望接受第二个参数 b。这里就产生了一个闭包，因为返回的函数能够“记住”第一个参数 a。
+
+>通过使用闭包和柯里化，你可以编写更灵活、更可复用的代码。这也是函数式编程中的一种常见模式。
+
+- 事件处理和回调：保留某些状态以供稍后使用。
+
+```html
+<!-- HTML部分 -->
+<ul id="myList">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</ul>
+```
+
+```js
+// 错误示例：这样做将会在每次点击时都输出最后一个索引
+const list = document.querySelectorAll('#myList li');
+for (var i = 0; i < list.length; i++) {
+  list[i].addEventListener('click', function() {
+    console.log("Clicked item index: " + i);
+  });
+}
+
+// 正确示例：使用闭包来捕获每个索引
+for (let i = 0; i < list.length; i++) {
+  list[i].addEventListener('click', (function(index) {
+    return function() {
+      console.log("Clicked item index: " + index);
+    };
+  })(i));
+}
+```
+
+>在错误示例中，由于JavaScript的变量提升和异步执行，点击任何一个列表项都会输出最后一个索引。
+
+>在正确示例中，我们使用了一个立即执行函数表达式（IIFE）和闭包来捕获循环中的每一个索引值。这样，当点击事件发生时，每一个列表项都能正确地访问到它自己的索引。
+
+>这个简单的例子展示了如何使用闭包在事件处理和回调中保存状态，这在实际开发中是非常常见的需求。通过这种方式，你可以编写更灵活和更强大的代码。
+
+- 5.注意事项：
+
+- 闭包使用不当会导致内存泄漏
+
+- 过度使用闭包会导致代码难以理解和维护
+
+## 20.事件循环（Event Loop） ⭐
+
+- 1.定义：因为JS是单线程执行的，所以它一次只能执行一个任务。但是它又需要一个机制来处理多个代码块的执行，也就是说js需要一种异步执行代码的机制，然后这种异步执行代码的机制就是事件循环。主线程首先执行所有的同步代码。当同步代码执行完成后，它会查看任务队列里查找有无等待的任务。如果任务队列中有等待需要被调用的函数，主线程会从队列中取出并执行它。这个过程是循环的，因此称为“事件循环”。
+
+- 2.然后放置异步代码的任务队列里的任务又会被分为宏任务和微任务。
+
+- 3.什么是宏任务和微任务？
+
+- 4.宏任务
+
+- script(整体代码)
+- setTimeout
+- setInterval
+- setImmediate
+- I/O
+- UI render
+
+- 5.微任务
+
+- process.nextTick
+- Promise.then()
+- Async/Await(实际就是promise)
+- MutationObserver(html5新特性)
+
+## 21.说一下ES6中的Proxy？
     
 Proxy用于创建一个对象的代理，从而实现对对象的基本的拦截和自定义。
 
-## 15.原型和原型链
+## 22.原型和原型链 ⭐
 
-## 16.promise
+- 1.原型的定义：JS中每个对象都有一个特殊的隐藏属性，这里我们就用 [[Prototype]] 表示，你如果平常打印对象的时候也能看到这个属性，这个属性要么是null，要么是对另一个对象的引用。这个对象也称为当前对象的“原型”。
 
-1、概念：Promise 对象用于表示一个异步操作的最终完成 (或失败)及其结果值。
+>tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
 
-2、状态：大致分为三种状态。
+- 2.原型链定义：因为原型本身也可能会有原型，这种关系形成一个链式结构，也就被称为原型链。
 
-①：pending：未决定的
+- 3.作用：
+  
+- 属性查找，当视图访问一个对象的属性时，如果对象本身没有这个属性，那么js就会去这个对象的原型上去找，一直找到这条原型链的终点null。
 
-②、resolved / fullfilled：成功
+- 继承：原型链允许一个对象继承另一个对象的属性和方法。
 
-③、rejected：失败
+- 4.注意：
 
-状态的改变：pending -》 resolved
+- 性能：属性查找如果在原型链深处，可能会略微影响性能，因此访问本地属性总是比访问继承的属性更快。
 
-pending -》 rejected
-
-3、解决了什么问题？
-
-①、支持链式调用，解决了回掉地狱的问题。
+- 原型链不应该过长：过长的原型链可能会影响性能，并增加查找属性时的复杂性。
     
-## 17.call，bind，apply
+## 23.call，bind，apply
 
 `call` 使用参数列表，`apply` 使用参数数组，而 `bind` 可以接受两者。
     
@@ -324,11 +571,11 @@ pending -》 rejected
     
 使用 `bind` 当你需要稍后执行函数，并希望该函数在执行时具有特定的 `this` 上下文。
  
-## 18.怎么实现一个迭代器？
+## 24.怎么实现一个迭代器？
 
 >普通对象不是可迭代类型对象，可迭代类型对象需要实现 Symbol.iterator 方法。
     
-## 20.js中哪些情况会造成内存泄漏？
+## 25.js中哪些情况会造成内存泄漏？
     
 1.闭包使用不当可能会导致内存泄漏。
 
@@ -338,7 +585,7 @@ pending -》 rejected
 
 4.隐式声明的全局变量。
     
-## 21.webworker
+## 26.webworker
     
 1.同源限制：分配给worker线程运行的脚本文件，必须与主线程的脚本文件同源
 
@@ -350,7 +597,7 @@ pending -》 rejected
 
 5.脚本限制：不能用alert和confirm，可以发送ajax请求
     
-## 22.函数柯里化
+## 27.函数柯里化 ⭐
     
 柯里化是指将多个参数的函数转换成一系列使用一个参数的函数。
     
@@ -359,7 +606,7 @@ pending -》 rejected
    
 ```
     
-## 23.写出new的执行过程，并自己实现一个new函数？
+## 28.写出new的执行过程，并自己实现一个new函数？ ⭐
     
 1.创建一个空的JavaScript对象（即{}）；
 
@@ -369,32 +616,16 @@ pending -》 rejected
 
 4.如果该函数没有返回对象，则返回this。    
     
-## 24.什么是事件委托和事件冒泡
+## 29.什么是事件委托和事件冒泡
     
 事件冒泡：在一个对象上触发某类事件（比如单击onclick事件），如果此对象定义了此事件的处理程序，那么此事件就会调用这个处理程序，如果没有定义此事件处理程序或者事件返回true，那么这个事件会向这个对象的父级对象传播，从里到外，直至它被处理（父级对象所有同类事件都将被激活），或者它到达了对象层次的最顶层，即document对象（有些浏览器是window）。
 
 事件委托：就是利用冒泡的原理，把事件加到父级上，通过判断事件来源的子集，执行相应的操作，事件委托首先可以极大减少事件绑定次数，提高性能；其次可以让新加入的子元素也可以拥有相同的操作。  
 
-## 25.requestAnimationFrame
-    
-## 26.Promise.all实现思路
-    
-1.首先返回的是一个new Promise
-    
-2.判断一下输入是不是数组，不是数组直接reject
-    
-3.是的话创建一个跟输入数组长度相同的空数组，用于保存最终结果
-    
-4.定义一个计数器，成功一个就+1 
-    
-5.遍历并创建新的Promise实例Promise.resolve,成功的话就将结果push到定义的空数组中，当计数器等于输入的数组大小时，将结果数组resolve出去
- 
-## 27.Promise.race实现思路    
-    
-1.首先返回的是一个new Promise
-    
-2.判断一下输入是不是数组，不是数组直接reject  
+## 30.requestAnimationFrame ⭐
 
-3.遍历所有promise
-    
-4.Promise.resolve(promise) 然后直接reslove或者reject
+## 31.设计模式 ⭐
+
+- 1.工厂模式
+
+## 32.说一说JS数组中的方法？
