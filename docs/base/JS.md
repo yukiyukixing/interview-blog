@@ -46,9 +46,7 @@
 
 ## 4.promise
 
-1、概念：Promise 对象用于表示一个异步操作的最终完成 (或失败)及其结果值。
-
-2、状态：大致分为三种状态。
+1.状态：大致分为三种状态。
 
 ①：pending：未决定的
 
@@ -130,7 +128,7 @@ function promiseRace(promiseArr) {
 ```
 
 ## 7.箭头函数和普通函数的区别？ ⭐
-    
+
 - 1.箭头函数没有自己的this，this来自于执行上下文。
 
 - 2.箭头函数不能用作构造函数，所以它也没有prototype。
@@ -145,14 +143,14 @@ function promiseRace(promiseArr) {
 
 ## 9.Map和Object的区别
 
-[Map](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map)：
+Map：
 
 -  键可以是任何类型
 -  有序集合（按插入顺序排序）
 -  内置方法（如 `get`、`set`、`has`、`delete`）
 -  可以轻易地获取大小（`.size`）
 
-[Object](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object)：
+Object：
     
 -   键必须是String或Symbol（虽然可以看起来是其他类型，但实际上会被转化为字符串）
 -   无序集合
@@ -161,35 +159,33 @@ function promiseRace(promiseArr) {
 
 >什么情况下用Map，什么情况下用Object？
     
-- 1.内存占用：给定固定大小的内存，Map大约可以比Object多存储50%的键值对，这是因为浏览器对Map和Object的内存分配的实现不一样。
-    
-- 2.增删性能：如果代码涉及到大量插入操作，那么显然Map的性能更佳，同样，如果代码涉及到大量的删除操作，也是Map的性能更佳。
+- 1.增删性能：如果代码涉及到大量插入操作，那么显然Map的性能更佳，同样，如果代码涉及到大量的删除操作，也是Map的性能更佳。
 
-- 3.查找操作，如果代码涉及到大量的查找操作，那么可能Object性能会更优一点。
+- 2.查找操作，如果代码涉及到大量的查找操作，那么可能Object性能会更优一点。
     
 ## 10.Map和Set
    
-**Map**: 存储键-值对。键可以是任何类型（包括对象、函数等）。
+- Map: 存储键-值对。键可以是任何类型（包括对象、函数等）。
     
-**[Set](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set)**: 存储唯一值，不允许重复。值可以是任何类型。
+- Set: 存储唯一值，不允许重复。值可以是任何类型。
     
 ## 11.Map和WeakMap，WeakMap和WeakSet
     
-**Map**:
+Map:
 
 -   键可以是任何类型
 -   键和值都可以被枚举
 -   强引用键，即使你删除了对键的引用，它也不会被垃圾回收
     
-**[WeakMap](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)**:
+WeakMap:
 
 -   键必须是对象
 -   键和值都不可枚举
 -   弱引用键，如果你删除了对键的引用，它就会被垃圾回收
 
-**WeakMap**: 存储键-值对，键必须是对象。
+WeakMap: 存储键-值对，键必须是对象。
     
-**WeakSet**: 存储唯一对象值。
+WeakSet: 存储唯一对象值。
     
 ## 12.WeakMap用于哪些场景下
     
@@ -540,8 +536,24 @@ for (let i = 0; i < list.length; i++) {
 - MutationObserver(html5新特性)
 
 ## 21.说一下ES6中的Proxy？
-    
-Proxy用于创建一个对象的代理，从而实现对对象的基本的拦截和自定义。
+
+>Proxy对象用于创建一个对象的代理，从而实现基本的拦截和自定义（属性查找，赋值，枚举，函数调用等）。
+
+>语法：
+
+```javascript
+let p = new Proxy(target,handler);
+```
+
+>参数：target：要使用Proxy包装的目标对象。handler：一个通常以函数作为属性的对象，各属性中的函数分别定义了在执行操作时代理p的行为。
+
+>Proxy本质上是一个构造函数。
+
+>Proxy.revocable()用来创建一个可撤销的Proxy对象，撤销方法revoke()。
+
+>Proxy作用：用于拦截和自定义对象的一些操作。
+
+- 总结：Proxy对象用于创建一个对象的代理，从而实现对对象的一些操作，例如拦截和自定义。Vue3中就使用了Proxy代替了Vue2中的Object.defineProperty。
 
 ## 22.原型和原型链 ⭐
 
@@ -563,14 +575,52 @@ Proxy用于创建一个对象的代理，从而实现对对象的基本的拦截
 
 - 原型链不应该过长：过长的原型链可能会影响性能，并增加查找属性时的复杂性。
     
-## 23.call，bind，apply
-
-`call` 使用参数列表，`apply` 使用参数数组，而 `bind` 可以接受两者。
-    
-使用 `call` 或 `apply` 当你需要立即执行函数，并改变 `this` 上下文。 
-    
-使用 `bind` 当你需要稍后执行函数，并希望该函数在执行时具有特定的 `this` 上下文。
+## 23.call，bind，apply，apply和call哪个性能更好？
  
+- 1.call、apply、bind都可以改变函数内部this的指向。
+
+- 2.call和apply返回的是值，而bind返回的是一个函数。
+
+- 3.call的第二参数是接收的一个参数列表，而apply的第二个参数接收的是一个数组。
+
+- 4.call的性能比apply的性能更好。
+
+>这三个方法都可以改变函数内部的this的指向。
+
+```javascript
+        // 1.手写bind
+        Function.prototype.myBind = function (obj = window, ...rest) {
+            const _that = this;
+            return function () {
+                if (new.target) {
+                    return new _that([...rest, ...arguments]);
+                } else {
+                    return _that.apply(obj, [...rest, ...arguments])
+                }
+            }
+        }
+```
+
+```javascript
+        // 手写call
+        Function.prototype.myCall = function (obj = window, ...rest) {
+            obj.fn = this;
+            const res = obj.fn(...rest);
+            obj.fn = null;
+            return res;
+        }
+```
+
+```javascript
+        // 手写apply
+        Function.prototype.myApply = function (obj = window, ...rest) {
+            obj.fn = this;
+            const res = obj.fn(rest);
+            obj.fn = null;
+            return res;
+        }
+```
+
 ## 24.怎么实现一个迭代器？
 
 >普通对象不是可迭代类型对象，可迭代类型对象需要实现 Symbol.iterator 方法。
@@ -599,23 +649,51 @@ Proxy用于创建一个对象的代理，从而实现对对象的基本的拦截
     
 ## 27.函数柯里化 ⭐
     
-柯里化是指将多个参数的函数转换成一系列使用一个参数的函数。
-    
+>将多个参数的一个函数转换成使用一系列一个参数的函数。
 
-```js
-   
+>也就是将fn(1,2,3,4)转换成fn(1)(2)(3)(4)
+
+```javascript
+        // 函数柯里化
+        function curry(fn) {
+            return function (a) {
+                return function (b) {
+                    return fn(a, b)
+                }
+            }
+        }
+        function A(a, b) {
+            return a + b
+        }
+        console.log(curry(A)(1)(2));
 ```
+
+>柯里化的好处：延迟执行，提前返回。
     
 ## 28.写出new的执行过程，并自己实现一个new函数？ ⭐
-    
-1.创建一个空的JavaScript对象（即{}）；
 
-2.链接该对象（设置该对象的constructor）到另一个对象；
+>new关键字的执行过程：
 
-3.将步骤1新创建的对象作为this的上下文；
+>1.创建一个空的JavaScript对象（即{}）；
 
-4.如果该函数没有返回对象，则返回this。    
-    
+>2.链接该对象（设置该对象的constructor）到另一个对象；
+
+>3.将步骤1新创建的对象作为this的上下文；
+
+>4.如果该函数没有返回**对象**，则返回this。
+
+>手写一个new：
+
+```javascript
+        // 传参写法
+        function myNew(fn, ...rest) {
+            const obj = {};
+            obj.__proto__ = fn.prototype;
+            const res = fn.apply(obj, rest);
+            return res instanceof Object ? res : obj;
+        }
+```
+
 ## 29.什么是事件委托和事件冒泡
     
 事件冒泡：在一个对象上触发某类事件（比如单击onclick事件），如果此对象定义了此事件的处理程序，那么此事件就会调用这个处理程序，如果没有定义此事件处理程序或者事件返回true，那么这个事件会向这个对象的父级对象传播，从里到外，直至它被处理（父级对象所有同类事件都将被激活），或者它到达了对象层次的最顶层，即document对象（有些浏览器是window）。
@@ -629,3 +707,202 @@ Proxy用于创建一个对象的代理，从而实现对对象的基本的拦截
 - 1.工厂模式
 
 ## 32.说一说JS数组中的方法？
+
+>总共31个。
+
+- 1.增删：push()、pop()、shift()、unshift()
+
+- 2.遍历：forEach()、reduce()、reduceRight()、some()、every()、filter()、map()
+
+- 3.查：indexOf()、lastIndexOf()、includes()、find()、findIndex()
+
+- 4.排序：sort()、reverse()
+
+- 5.合并：concat()、join()
+
+- 6.拆分：splice()、slice()
+
+- 7.填充：fill()、copyWithin()
+
+- 8.迭代：keys()、values()、entries()
+
+- 9.转换方法：toString()、toLoacaleString()
+
+- 10.扁平化方法：flat()、flatMap()
+
+## 33.ES Module、CommonJS
+
+- 1.  **语法**：CommonJS 使用 `require` 和 `module.exports`，而 ESM 使用 `import` 和 `export`。
+
+- 2.  **运行时 vs 编译时**：CommonJS 是运行时执行，而 ESM 是编译时执行。
+
+- 3.  **动态 vs 静态**：CommonJS 可以动态加载模块，而 ESM 是静态的。
+
+- 4.  **适用场景**：CommonJS 主要用于服务器端（Node.js），而 ESM 主要用于浏览器，但现在 Node.js 也越来越支持 ESM。
+
+## 34.map 和 forEach的区别
+
+## 35.数组对象排序
+
+```javascript
+const arr = [{ a: 1, b: 2 }, { a: 0, b: 1 }, { a: 10, b: 11 }];
+
+console.log(arr.sort(function (a, b) {
+    return (a.a + a.b) - (b.a + b.b);
+}));
+```
+
+## 36.数组去重，数组对象去重。
+
+>1.new Set()
+
+>2.双循环。
+
+>3.利用indexOf。
+
+>采用fiter，map，reduce等方法。
+
+## 37.用Promise实现一个延时？
+
+## 38.用ES5的语法实现ES6的类？
+
+## 39.写一个ES5的继承？
+
+```javascript
+        // 1.原型链继承
+        function A() { }
+        function B() { }
+        B.prototype = new A();
+```
+
+>缺点：引用类型所有属性被实例共享。
+
+```javascript
+        // 2.盗用构造函数继承
+        function A() { }
+        function B() {
+            A.call(this);
+        }
+```
+
+>方法都在构造函数中定义，每次创建实例都会创建一遍方法。
+
+```javascript
+        // 3.组合继承
+        function A() { }
+        function B() {
+            A.call(this);
+        }
+        B.prototype = new A();
+```
+
+>融合了上面2种模式的优点，是JS种最常用的继承方式。
+
+```javascript
+        // 4.原型式继承
+        function A(o) {
+            function F() { }
+            F.prototype = o;
+            return new F();
+        }
+```
+
+>所有实例会共享引用类型属性
+
+```javascript
+        // 5.寄生式继承
+        function A(o) {
+            const clone = Object.create(o);
+            clone.sayName = function () {
+                console.log('小王');
+            }
+            return clone;
+        }
+```
+
+>缺点：每次创建实例的时候，方法都会被重新创建一遍。
+
+```javascript
+        // 6.寄生式组合继承
+        function object(o) {
+            function F() { };
+            F.prototype = 0;
+            return new F();
+        }
+        function inheritPrototype(B, A) {
+            const prototype = object(A.prototype);
+            prototype.constructor = B;
+            B.prototype = prototype;
+        }
+        function A() { }
+        function B() {
+            A.call(this);
+        }
+        inheritPrototype(B, A);
+```
+
+>引用类型最佳的继承范式
+
+## 40.作用域？
+
+>什么是作用域？作用域就是变量，函数可访问的范围。
+
+>什么是作用域链？js引擎在运行的时候，查找变量的时候会从当前执行作用域逐级向外查找，形成一条链状结构，就是作用域链。
+
+>切换作用域是消耗性能的。
+
+## 41.JS中this的指向？
+
+1.一般情况下，this是指向调用者。如果在全局调用那就是指向window。
+
+2.使用new的时候，this指向创建的对象。
+
+3.箭头函数中的this来自于上下文。
+
+4.在使用call和apply以及bind的时候绑定到指定的对象。
+
+## 42.立即执行函数？
+
+>声明一个函数并立马调用这个匿名函数就是立即执行函数。
+
+>作用：1.不必为函数命名，也不会污染全局变量。 2.立即执行函数形成一个单独的作用域，可以声明一些私有变量。
+
+>使用场景：1.将代码包裹在局部作用域中，不会让任何变量污染到全局。2.所有的动作只需要执行一次，例如某个事件。3.代码在页面加载完成之后，不得不执行一些设置工作。
+
+## 43.instanceof
+
+>instanceof运算符用来检测某个构造函数的原型是否在某个对象实例的原型链上。
+
+>手写一个instanceof？
+
+```javascript
+        // 手写instanceof，关键是抓住left._proto_===Right.peorotype这个等式就行
+        function myInstanceof(left, Right) {
+            left = left.__proto__;
+            Right = Right.prototype;
+            while (true) {
+                if (left === null) {
+                    return false;
+                }
+                if (left === Right) {
+                    return true;
+                }
+                left = left.__proto__;
+            }
+        }
+```
+
+## 44.js中如何判断一个数组是数组？
+
+>被面到过✔✔✔✔✔。
+
+>1.Array.isArray()。
+
+>2.arr instanceof Array。
+
+>3.arr.constructor === Array;这个利用的是构造函数原型的constructor等于构造函数本身的特性。Array.prototype.constructor === Array。
+
+>4.Object.prototype.toString.call()。
+
+## 45.实现一个发布订阅系统，包括 on、emit、off 等等？
+

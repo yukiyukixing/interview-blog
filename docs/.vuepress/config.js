@@ -1,23 +1,14 @@
 module.exports = {
-    // title: 'Hello VuePress',
-    // description: 'Just playing around',
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '@images': '../assets/images'
+            }
+        }
+    },
     themeConfig: {
         search: false,
         navbar: false,
-        // nav: [
-        //     { text: 'Home', link: '/' },
-        //     { text: 'Guide', link: '/guide/' },
-        //     { text: 'External', link: 'https://google.com' },
-        // ],
-        // sidebar: [
-        //     '/',
-        //     '/大纲',
-        //     '/简历与自我介绍',
-        //     '/基础知识',
-        //     '/项目',
-        //     '/面试实战',
-        //     '/经验总结',
-        // ]
         sidebar: [
             {
                 title: '前言',   // 必要的
@@ -31,14 +22,12 @@ module.exports = {
                 path: '/大纲',
                 children: [],
                 collapsable: false,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },
             {
                 title: '简历与自我介绍',
                 path: '/简历与自我介绍',
                 children: [],
                 collapsable: false,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },
             {
                 title: '基础知识',
@@ -53,30 +42,28 @@ module.exports = {
                     '/base/可视化',
                     '/base/微前端',
                     '/base/算法',
+                    '/base/Vue',
+                    '/base/安全',
                 ],
                 collapsable: true,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },
             {
                 title: '项目',
                 path: '/项目',
                 children: [],
                 collapsable: false,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },
             {
                 title: '面试实战',
                 path: '/面试实战',
                 children: [],
                 collapsable: false,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             },
             {
                 title: '经验总结',
                 path: '/经验总结',
                 children: [],
                 collapsable: false,
-                // initialOpenGroupIndex: -1 // 可选的, 默认值是 0
             }
         ]
     }
