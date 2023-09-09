@@ -1,44 +1,252 @@
 # 2.CSS
 
-## 1.BFC
+## 1.BFC ⭐
 
-BFC（Block Formatting Context，块级格式化上下文）是 Web 页面的可视化 CSS 渲染的一部分，是布局过程中生成块级盒子的区域，也是浮动元素与其他元素的交互限定区域。
+- BFC：块级格式上下文
 
-### 创建 BFC 的条件
+（1）创建 BFC 的条件：
 
->块级格式上下文，块盒子布局过程中发生的区域，也是浮动元素与其他元素发生交互的区域。
+- 1.position设置未absolute和fixed。
 
->创建BFC的情况。
+- 2.float不为none。
 
->1.根元素。
+- 3.display的inline-block或fixed。
 
->2.position设置未absolute和fixed。
+- 4.overflow不为visible
 
->3.float元素设置为非none。
+（2）应用：
 
->4.display的inline-block和fixed。
+- 1.清除内部浮动：当内部有浮动元素时，可以设置父元素为BFC，避免高度塌陷。
 
->5.overflow设置为非visible。
+```html
+<!DOCTYPE html>
+<html lang="en">
 
->应用：1.解决margin会导致的外边距塌陷问题。2.清除浮动。3.阻止元素被浮动元素覆盖。
+<head>
+    <meta charset="UTF-8">
+    <title>BFC Example</title>
+    <style>
+        .container {
+            border: 3px solid red;
+            /* 创建BFC */
+            /* overflow: auto; */
+        }
 
-## 2.水平垂直居中？
+        .float-box {
+            float: left;
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+            margin: 5px;
+        }
+    </style>
+</head>
 
-## 3.flex属性？flex:1
+<body>
 
-## 4.上下固定，中间自适应布局。
-## 5.外边距折叠问题
+    <div class="container">
+        <div class="float-box"></div>
+        <div class="float-box"></div>
+    </div>
 
->如果有2个外边距相接的元素，都分别设置外边距的话，那么两个外边距将合并为一个外边距，即取最大的单个外边距大小。
+</body>
 
-## 6.CSS盒模型
+</html>
+```
 
->1.css盒模型的组成：content，padding，border，margin。
+- 2.避免外边距合并。
 
->2.标准盒模型：标准盒模型的宽度为with+padding+border。
+```html
+<!DOCTYPE html>
+<html lang="en">
 
->3.IE盒模型：设置的content就是盒模型的大小。
+<head>
+    <meta charset="UTF-8">
+    <title>Margin Collapsing Example</title>
+    <style>
+        .box1 {
+            height: 50px;
+            background-color: salmon;
+            margin-bottom: 20px;
+        }
 
->也就是说盒模型的大小并不等于width，而标准盒模型的大小是width+padding+border，而IE盒模型的大小就是with，而content等于width-padding-border。
+        .box2 {
+            height: 50px;
+            background-color: lightblue;
+            margin-top: 30px;
+        }
 
->首先，盒模型由4部分组成，从内到外分别是content，padding，border，margin。然后盒模型的大小其实也是由content，padding，border来决定的，标准盒模型大小等于width+padding+border，例如设置width为100，padding为10，border为10，那么这个盒模型的大小为140，如果是IE盒模型设置width为100，那么这个盒模型的大小就为100，且content等于100-40=60。也就是说标准盒模型content等于width，ie盒模型，content等width-padding-border。然后我们可以去通过box-sizing属性切换标准盒模型和ie盒模型，box-sizing默认是标准盒模型，content-box，ie盒模型值是border-box。
+        .bfc-container {
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3>Without BFC:</h3>
+    <div class="box1"></div>
+    <div class="box2"></div>
+
+    <h3>With BFC:</h3>
+    <div class="bfc-container">
+        <div class="box1"></div>
+    </div>
+    <div class="box2"></div>
+
+</body>
+
+</html>
+```
+
+- 3.阻止元素被浮动元素覆盖。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BFC Float Interaction Example</title>
+    <style>
+        .float-box {
+            float: left;
+            width: 100px;
+            height: 100px;
+            background-color: salmon;
+        }
+
+        .normal-box {
+            width: 150px;
+            height: 150px;
+            background-color: lightblue;
+            margin-left: 50px;
+            /* Intentionally overlap with .float-box without BFC */
+        }
+
+        .bfc-box {
+            overflow: auto;
+            /* This creates a new BFC */
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3>Without BFC:</h3>
+    <div class="float-box"></div>
+    <div class="normal-box"></div>
+
+    <h3>With BFC:</h3>
+    <div class="float-box"></div>
+    <div class="normal-box bfc-box"></div>
+
+</body>
+
+</html>
+```
+
+## 2.flex:1 ⭐
+
+- 定义：flex: 1 是 flex-grow:1, flex-shrink:2, 和 flex-basis:0% 这三个属性的简写。
+
+- 1.flex-grow：定义了在 flex 容器中分配剩余空间的相对比例
+
+- 2.flex-shrink：定义了在flex 容器空间不足时的收缩能力
+
+- 3.flex-basis: 定义了 flex元素在主轴方向上的初始大小
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex Example</title>
+    <style>
+        .flex-container {
+            display: flex;
+            height: 100px;
+            border: 2px solid black;
+        }
+
+        .flex-item {
+            flex: 1;
+        }
+
+        /* 下面是可选的，仅用于为每个flex item设置不同的背景色，使它们更容易区分 */
+        .flex-item:nth-child(1) {
+            background-color: lightblue;
+        }
+
+        .flex-item:nth-child(2) {
+            background-color: lightcoral;
+        }
+
+        .flex-item:nth-child(3) {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="flex-container">
+        <div class="flex-item">Item 1</div>
+        <div class="flex-item">Item 2</div>
+        <div class="flex-item">Item 3</div>
+    </div>
+
+</body>
+
+</html>
+```
+
+## 3.盒模型
+
+- 1.标准盒模型大小：width+padding+border，box-sizing默认值content-box是标准盒模型。
+
+- 2.ie盒模型大小：width，content = width - padding - border，box-sizing: border-box
+
+## 4.水平垂直居中
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox Centering Example</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            /* 水平居中 */
+            align-items: center;
+            /* 垂直居中 */
+            height: 100vh;
+            /* 使容器填满整个视口的高度 */
+            border: 2px solid black;
+            /* 为了更明显地看到居中效果，添加了边框 */
+        }
+
+        .centered-item {
+            padding: 20px;
+            background-color: salmon;
+            border: 1px solid darkred;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="centered-item">我是居中的内容</div>
+    </div>
+
+</body>
+
+</html>
+```

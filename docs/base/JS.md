@@ -1,6 +1,148 @@
 # 1.JS
 
-## 1.for in 和 for of 的区别（✔被问到概率很高）⭐ 
+## 1.浏览器中的事件循环（Event Loop） ⭐
+
+- 1.定义：因为JS是单线程执行的，所以它一次只能执行一个任务，如果这个任务时间过长就会造成阻塞，所以JS需要一个异步执行代码的机制，然后就有了事件循环的机制。主线程首先从上到下将JS代码放到执行栈中执行，当执行到异步代码的时候，会将这部分要执行的代码放到异步的任务队列里面，如果是宏任务，就会放到宏任务队列里，如果是微任务，就会放到微任务队列里。当同步代码执行完成后，这时候执行栈为空，js引擎会先查看当前微任务队列里面有没有要执行的任务，如果有一个一个的拿出来放到执行栈中执行，执行完看当前宏任务队列里面有没有要执行的任务，有的话也一个一个的拿出来放到执行栈中执行，执行完开始执行下一个宏任务代码。这个过程是循环的，因此称为“事件循环”。
+
+- 2.什么是宏任务和微任务？
+
+- 宏任务定义：宏任务是异步执行的代码块，事件循环中独立调度的一个工作单元。
+
+- 微任务定义：微任务也是异步执行的代码块，不过执行的优先级比宏任务更高。
+
+- 3.宏任务包含哪些
+
+- （1）整个script标签里的代码块
+
+- （2）setTimeout
+
+- （3）setInterval
+
+- （4）setImmediate
+
+- （5）I/O操作（输入/输出）
+
+- （6）UI渲染
+
+- 5.微任务
+
+- （1）Promise.then catch
+
+- （2）MutationObserver（监控dom树的变化）
+
+## 2.深拷贝，浅拷贝 ⭐
+    
+- 1.深浅拷贝是针对引用类型说的，原始类型不存在深浅拷贝。
+
+- 2.然后浅拷贝是复制的是对象的引用，而深拷贝是拷贝了一个完全一模一样的对象。
+
+- 3.浅拷贝的方式：1.Object.assign() 2.展开运算符 3.循环遍历
+
+- 4.深拷贝的方式：1.JSON.parse(JSON.stringify(obj)) 2.递归 3.lodash中的_.defaultsDeep()方法。
+
+>tips: 利用JSON.stringify()的缺陷，处理不了function对象、undefined以及symbol类型，原因是JSON.stringify()在处理这些类型，这些类型会被忽略，不会被处理。并且JSON.stringify()也解决不了循环引用的问题。
+    
+>深拷贝怎么解决循环引用？
+
+解决循环引用问题，你通常需要维护一个“已访问”的对象列表。当你试图拷贝一个对象时，你首先检查这个对象是否已经被拷贝过了。如果是，你直接返回之前拷贝过的新对象的引用，而不是重新拷贝它。
+    
+```js
+        const obj = {
+            quote: null
+        }
+        obj.quote = obj;
+        function deepCopy(obj, visited = new Map()) {
+            // 基础类型或 null，直接返回
+            if (obj === null || typeof obj !== 'object') {
+                return obj
+            }
+            // 检查是否循环引用
+            if (visited.has(obj)) {
+                return visited.get(obj)
+            }
+            // 对于数组或对象，创建一个新的空数组或对象
+            const copy = Array.isArray(obj) ? [] : {};
+            // 将当前正在拷贝的对象加入已访问列表
+            visited.set(obj, copy);
+            // 递归拷贝所有属性
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    copy[key] = deepCopy(obj[key], visited);
+                }
+            }
+            return copy
+        }
+        console.log(deepCopy(obj));
+```
+
+## 3.防抖、节流 ⭐
+
+- 1.防抖：函数被触发n秒之后再执行，如果在这n秒内函数被再次触发，则重新计时。
+
+应用场景:
+    
+- 搜索框文本输入。当用户停止输入一段时间后，才发送请求进行搜索。
+- 窗口调整大小。当用户停止调整窗口大小一段时间后，才重新计算布局。(注：这个场景根据需求来，使用防抖和节流理论上都是可以的，看你的需求是什么。)
+
+```js
+function debounce(fn, delay) {
+    let timer;
+    return function () {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout((...args) => {
+            fn.apply(this, args);
+        }, delay)
+    }
+}
+```
+
+- 2.节流：节流确保一个函数在指定的时间间隔内只执行一次，即使在这段时间内触发多次。
+
+应用场景:
+    
+- 滚动事件。例如，在用户滚动时定期检查页面的位置，而不是每次滚动都检查。
+- 窗口调整大小。间隔一段时间更新一次，让你在调整的过程中能看到布局的变化。
+
+```js
+function throttle(fn, delay) {
+    let lastCall = 0
+    return function (...args) {
+        const now = new Date().getTime()
+        if (now - lastCall >= delay) {
+            lastCall = now
+            return fn.apply(this,args)
+        }
+    }
+}
+```
+
+## 4.原型和原型链 ⭐
+
+- 1.原型的定义：JS中每个对象都有一个特殊的隐藏属性，这里我们就用 [[Prototype]] 表示，这个属性要么是null，要么是对另一个对象的引用。这个对象也称为当前对象的“原型”。
+
+>tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
+
+- 2.原型链定义：因为原型本身也可能会有原型，这种关系形成一个链式结构，也就被称为原型链。
+
+- 3.作用：
+  
+- 属性查找，当视图访问一个对象的属性时，如果对象本身没有这个属性，那么js就会去这个对象的原型上去找，一直找到这条原型链的终点null。
+
+- 继承：原型链允许一个对象继承另一个对象的属性和方法。
+
+## 5.requestAnimationFrame ⭐
+
+- 1.作用：requestAnimationFrame告诉浏览器你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。
+
+- 2.性能：
+ 
+（1）因为requestAnimationFrame的执行时机是在每次重绘之前，所以会减少不必要的帧和重绘，并且它也会尽量的跟浏览器的刷新率同步，通常是60帧/秒。
+
+（2）当页面标签切换后或页面不可见时，requestAnimationFrame会被暂停，以提升性能。
+
+## 6.for in 和 for of 的区别 ⭐ 
 
 - 1.for...in遍历的是key，而for...of遍历的是value
 
@@ -12,71 +154,75 @@
 
 >tips：hasOwnProperty()方法可以判断属性是否是属于对象本身，属于的话为true，不属于为false。
 
-## 2.ES6有哪些新属性？
+## 7.箭头函数和普通函数的区别？ ⭐
 
-- 1.let和const
+- 1.箭头函数没有自己的this，this来自于执行上下文。
 
-- 2.Promise
+- 2.箭头函数不能用作构造函数，所以它也没有prototype。
 
-- 3.for...of
+- 3.箭头函数没有arguments，不能使用arguments取函数的参数。
 
-- 4.展开语法和对象数组解构
+## 8.写出new的执行过程，并自己实现一个new函数？ ⭐
 
-- 5.箭头函数
+- 定义：new运算符可以用来创建一个新的对象实例。
 
-- 6.函数传默认参数
+>new关键字的执行过程：
 
-- 7.Map，Set，WeakMap，WeakSet
+- 1.创建一个空的JS对象（即{}）
 
-- 8.类
+- 2.将新创建的对象的原型链接到构造函数的原型，确保新对象可以继承构造函数原型上的方法和属性
 
-- 9.模板字符串
+- 3.将新创建的对象作为this的上下文
 
-- 10.Proxy
+- 4.如果该函数没有返回对象，则返回新创建的对象
 
-## 3.let、var、const的区别
-    
-1.let不能重复定义变量，而var可以
+>手写一个new：
 
-2.var存在变量提升，可在声明前使用变量，而let由于存在暂时性死区不能在声明变量前使用
+```javascript
+        // 传参写法
+        function myNew(fn, ...rest) {
+            const obj = {};
+            obj.__proto__ = fn.prototype;
+            const res = fn.apply(obj, rest);
+            return typeof res === 'object' && res !== null ? res : obj
+        }
+```
 
-3.var声明的变量会挂载到window下面，而let不会挂到window下面，而是形成一个块级作用域。
+## 9.instanceof
 
-4.const定义的是常量，定义之后就不可更改，而且初始化的时候必须赋值，其他和let一样。
+>instanceof运算符用来检测某个构造函数的原型是否在某个对象实例的原型链上。
 
-## 4.promise
+>手写一个instanceof？
 
-1.状态：大致分为三种状态。
+```js
+function myInstanceof(leftObj, rightFn) {
+    let left = leftObj.__proto__
+    const right = rightFn.prototype
+    while (left) {
+        if (left === right) {
+            return true
+        }
+        left = left.__proto__
+    }
+    return false
+}
+```
 
-①：pending：未决定的
+## 10.Promise ⭐
 
-②、resolved / fullfilled：成功
+（1）状态：大致分为三种状态。
 
-③、rejected：失败
+①：pending：待定
+
+②、fullfilled：已实现
+
+③、rejected：已拒绝
 
 3、解决了什么问题？
 
-①、支持链式调用，解决了回掉地狱的问题。
+①、支持链式调用，解决了回调地狱的问题。
 
-## 5.手写一个Promise.all ⭐
-
-手写一个Promise.all的步骤：
-
-- 1.创建一个新的 Promise: 在 promiseAll 函数中返回一个新的 Promise 对象。
-
-- 2.初始化结果数组和计数器: 创建一个数组来存储每个 Promise 的结果，并初始化一个计数器来追踪已完成的 Promise 的数量。
-
-- 3.处理空数组: 如果输入的数组为空，直接返回一个 resolve 状态的 Promise。
-
-- 4.遍历 Promise 数组: 对输入的 Promise 数组进行遍历。
-
-- 5.处理单个 Promise: 对每个 Promise 使用 Promise.resolve 包裹，以确保非 Promise 对象也能被正确处理。
-
-- 6.成功状态（Fulfilled）: 当一个 Promise 完成（fulfilled）时，将其结果存储在结果数组的相应位置，并增加计数器。
-
-- 7.检查是否全部完成: 在每个单个 Promise 完成后，检查所有的 Promise 是否都已完成。如果是，则将 Promise.all 返回的 Promise 置为 fulfilled 状态，并传递结果数组。
-
-- 8.失败状态（Rejected）: 如果任何一个 Promise 失败（rejected），则立即使整个 Promise.all 返回的 Promise 转为 rejected 状态，并传递失败的原因。
+（2）手写一个Promise.all ⭐
 
 ```js
 function promiseAll(promiseArr) {
@@ -99,21 +245,7 @@ function promiseAll(promiseArr) {
 }
 ```
 
-## 6.手写一个Promise.race
-
-手写一个Promise.race的步骤：
-
-- 1.创建一个新的 Promise: 在 promiseRace 函数内部，返回一个新的 Promise 对象。
-
-- 2.空数组处理: 如果输入的 Promise 数组为空，可以返回一个永远不会 settle（即不会 fulfilled 或 rejected）的 Promise，以符合原生 Promise.race 的行为。
-
-- 3.遍历 Promise 数组: 对输入的 Promise 数组进行遍历。
-
-- 4.单个 Promise 处理: 使用 Promise.resolve 方法包裹每一个 Promise（或可能不是 Promise 的对象），以确保它们都是 Promise 对象。
-
-- 5.成功状态（Fulfilled）: 如果其中一个 Promise 完成（fulfilled），则立即将 Promise.race 返回的 Promise 的状态设为 fulfilled，并返回该 Promise 的结果。
-
-- 6.失败状态（Rejected）: 如果其中一个 Promise 失败（rejected），则立即将 Promise.race 返回的 Promise 的状态设为 rejected，并返回该 Promise 的失败原因。
+（3）手写一个Promise.race
 
 ```js
 function promiseRace(promiseArr) {
@@ -127,21 +259,181 @@ function promiseRace(promiseArr) {
 }
 ```
 
-## 7.箭头函数和普通函数的区别？ ⭐
+## 11.函数柯里化 ⭐
+    
+>将多个参数的一个函数转换成使用一系列一个参数的函数。
 
-- 1.箭头函数没有自己的this，this来自于执行上下文。
+>也就是将fn(1,2,3,4)转换成fn(1)(2)(3)(4)
 
-- 2.箭头函数不能用作构造函数，所以它也没有prototype。
+```js
+function curry(fn) {
+    const len = fn.length
+    return function curryFn(...args) {
+        if (args.length >= len) {
+            return fn(...args)
+        } else {
+            return function (...newArgs) {
+                return curryFn(...args, ...newArgs)
+            }
+        }
+    }
+}
+```
 
-- 3.箭头函数没有arguments，不能使用arguments取函数的参数。
+>柯里化的好处：延迟执行，提前返回。
 
-## 8.JS数据类型？
+## 12.设计模式 ⭐
+
+- 1.模块模式：创建私有和公共封装的方式。在ES6之前，JS没有内置的模块系统，所以模块模式成为了实现封装和避免全局作用域污染的流行方法。ES6引入了模块导入和导出。
+
+```js
+const myMoudel = (function () {
+    const name = 'Jack'
+    function getName() {
+        return name
+    }
+    return {
+        publicMethod: function () {
+            return getName() + '18'
+        }
+    }
+})()
+console.log(myMoudel.publicMethod());
+```
+
+- 2.观察者模式：也被称为发布/订阅模式。在这种模式中，一个对象（发布者）维护一系列依赖于它的对象（观察者），并在任何状态更改时自动通知它们。
+
+```js
+class Observer {
+    constructor() {
+        this.listeners = []
+    }
+
+    on(listener) {
+        this.listeners.push(listener)
+    }
+    emit(data) {
+        this.listeners.forEach(listener => listener(data))
+    }
+}
+const obs = new Observer();
+obs.subscribe(data => console.log("Listener 1: " + data));
+obs.subscribe(data => console.log("Listener 2: " + data));
+obs.notify("Hello World!");
+```
+
+- 3.工厂模式：这种模式用于创建对象，让子类决定实例化哪一个类。它提供了一个创建对象的接口，但允许子类更改将要实例化的类。
+
+- 4.单例模式：该模式确保一个类只有一个实例，并提供了一个全局访问该实例的点。
+
+- 5.原型模式：JS是基于原型的语言，所以这种模式在语言核心中已经内建。它允许你复制或克隆对象，而不是每次都从零开始创建。
+
+## 13.实现一个发布订阅系统 ⭐
+
+```js
+class Observer {
+    constructor() {
+        this.listeners = []
+    }
+
+    on(listener) {
+        this.listeners.push(listener)
+    }
+    emit(data) {
+        this.listeners.forEach(listener => listener(data))
+    }
+}
+const obs = new Observer();
+obs.subscribe(data => console.log("Listener 1: " + data));
+obs.subscribe(data => console.log("Listener 2: " + data));
+obs.notify("Hello World!");
+```
+
+## 14.call，bind，apply，apply和call哪个性能更好？
+ 
+- 1.call、apply、bind都可以改变函数内部this的指向。
+
+- 2.call和apply返回的是值，而bind返回的是一个函数。
+
+- 3.call的第二参数是接收的一个参数列表，而apply的第二个参数接收的是一个数组。
+
+- 4.call的性能比apply的性能更好。
+
+>这三个方法都可以改变函数内部的this的指向。
+
+```javascript
+        // 1.手写bind
+        Function.prototype.myBind = function (obj = window, ...rest) {
+            const _that = this;
+            return function () {
+                if (new.target) {
+                    return new _that([...rest, ...arguments]);
+                } else {
+                    return _that.apply(obj, [...rest, ...arguments])
+                }
+            }
+        }
+```
+
+```javascript
+        // 手写call
+        Function.prototype.myCall = function (obj = window, ...rest) {
+            obj.fn = this;
+            const res = obj.fn(...rest);
+            obj.fn = null;
+            return res;
+        }
+```
+
+```javascript
+        // 手写apply
+        Function.prototype.myApply = function (obj = window, ...rest) {
+            obj.fn = this;
+            const res = obj.fn(rest);
+            obj.fn = null;
+            return res;
+        }
+```
+
+## 15.ES6有哪些新属性？
+
+- 1.let和const
+
+- 2.Promise
+
+- 3.for...of
+
+- 4.展开语法和对象数组解构
+
+- 5.箭头函数
+
+- 6.函数传默认参数
+
+- 7.Map，Set，WeakMap，WeakSet
+
+- 8.类
+
+- 9.模板字符串
+
+- 10.Proxy
+
+## 16.let、var、const的区别
+    
+1.let不能重复定义变量，而var可以
+
+2.var存在变量提升，可在声明前使用变量，而let由于存在暂时性死区不能在声明变量前使用
+
+3.var声明的变量会挂载到window下面，而let不会挂到window下面，而是形成一个块级作用域。
+
+4.const定义的是常量，定义之后就不可更改，而且初始化的时候必须赋值，其他和let一样。
+
+## 17.JS数据类型
     
 - 1.原始类型：number、boolean、null、undefined、string、Symbol、BigInt
 
 - 2.引用类型：Object
 
-## 9.Map和Object的区别
+## 18.Map和Object的区别
 
 Map：
 
@@ -163,13 +455,13 @@ Object：
 
 - 2.查找操作，如果代码涉及到大量的查找操作，那么可能Object性能会更优一点。
     
-## 10.Map和Set
+## 19.Map和Set
    
 - Map: 存储键-值对。键可以是任何类型（包括对象、函数等）。
     
 - Set: 存储唯一值，不允许重复。值可以是任何类型。
     
-## 11.Map和WeakMap，WeakMap和WeakSet
+## 20.Map和WeakMap，WeakMap和WeakSet
     
 Map:
 
@@ -187,7 +479,7 @@ WeakMap: 存储键-值对，键必须是对象。
     
 WeakSet: 存储唯一对象值。
     
-## 12.WeakMap用于哪些场景下
+## 21.WeakMap用于哪些场景下
     
 - 1.缓存和记忆化：WeakMap 可用于缓存已经计算过的结果，以便将来快速检索。由于它是弱引用的，所以当对象不再需要时，它们可以被垃圾收集。
     
@@ -218,120 +510,7 @@ WeakSet: 存储唯一对象值。
         });
 ```
 
-## 13.深拷贝，浅拷贝 ⭐
-    
-- 1.深浅拷贝是针对引用类型说的，原始类型不存在深浅拷贝。
-
-- 2.然后浅拷贝是复制的是对象的引用，而深拷贝是拷贝了一个完全一模一样的对象。
-
-- 3.浅拷贝的方式：1.Object.assign() 2.展开运算符 3.循环遍历
-
-- 4.深拷贝的方式：1.JSON.parse(JSON.stringify(obj)) 2.递归 3.jquery的$.extend()方法 4.lodash中的_.defaultsDeep()方法。
-
->tips: 利用JSON.stringify()的缺陷，处理不了function对象、undefined以及symbol类型，原因是JSON.stringify()在处理这些类型，这些类型会被忽略，不会被处理。并且JSON.stringify()也解决不了循环引用的问题，例如下面这个代码是会报错的，会报Converting circular structure to JSON，也就是将循环结构转换成JSON
-
-```js
-        const obj = {
-            quote: null
-        }
-        obj.quote = obj
-        JSON.parse(JSON.stringify(obj))
-```
-    
-[JS基础之深浅拷贝](https://juejin.cn/post/6908309980206759943)
-    
->深拷贝怎么解决循环引用？
-
-解决循环引用问题，你通常需要维护一个“已访问”的对象列表。当你试图拷贝一个对象时，你首先检查这个对象是否已经被拷贝过了。如果是，你直接返回之前拷贝过的新对象的引用，而不是重新拷贝它。
-    
-```js
-        const obj = {
-            quote: null
-        }
-        obj.quote = obj;
-        function deepCopy(obj, visited = new Map()) {
-            // 基础类型或 null，直接返回
-            if (obj === null || typeof obj !== 'object') {
-                return obj
-            }
-            // 检查是否循环引用
-            if (visited.has(obj)) {
-                return visited.get(obj)
-            }
-            // 对于数组或对象，创建一个新的空数组或对象
-            const copy = Array.isArray(obj) ? [] : {};
-            // 将当前正在拷贝的对象加入已访问列表
-            visited.set(obj, copy);
-            // 递归拷贝所有属性
-            for (const key in obj) {
-                if (Object.hasOwnProperty.call(obj, key)) {
-                    copy[key] = deepCopy(obj[key], visited);
-                }
-            }
-            return copy
-        }
-        console.log(deepCopy(obj));
-```
-      
-## 14.浏览器事件机制？
-    
-- 1.事件委托基于事件冒泡的原理，允许我们不直接绑定事件处理程序到每个单独的元素，而是绑定到一个共同的父元素。当该父元素的子元素触发了特定的事件时，事件处理程序会被执行。
-
-事件委托的好处：
-
-- 1.性能优化: 当你有大量的子元素需要相同的事件处理时，使用事件委托可以减少事件处理程序的数量，从而提高性能。
-  
-- 2.动态元素: 对于在后期通过JavaScript动态添加到DOM的元素，你不需要为它们单独绑定事件。因为它们自然会继承父元素的事件处理。
-
-## 15.防抖、节流 ⭐
-
-- 1.防抖：函数被触发n秒之后再执行，如果在这n秒内函数被再次触发，则重新计时。
-
-应用场景:
-    
-- 搜索框文本输入。当用户停止输入一段时间后，才发送请求进行搜索。
-- 窗口调整大小。当用户停止调整窗口大小一段时间后，才重新计算布局。(注：这个场景根据需求来，使用防抖和节流理论上都是可以的，看你的需求是什么。)
-
-```js
-function debounce(fn, delay) {
-    let timer;
-    return function () {
-        if (timer) {
-            clearTimeout(timer);
-        }
-        timer = setTimeout((...args) => {
-            fn.apply(this, args);
-        }, delay)
-    }
-}
-```
-    
-- 2.节流：节流确保一个函数在指定的时间间隔内只执行一次，即使在这段时间内触发多次。
-
-应用场景:
-    
-- 滚动事件。例如，在用户滚动时定期检查页面的位置，而不是每次滚动都检查。
-- 窗口调整大小。间隔一段时间更新一次，让你在调整的过程中能看到布局的变化。
-
-```js
-function throttle(fn, delay) {
-    let lastCall = 0
-    return function (...args) {
-        const now = new Date().getTime()
-        if (now - lastCall >= delay) {
-            lastCall = now
-            return fn.apply(this,args)
-        }
-    }
-}
-```
-
-区别：
-
--  防抖: 保证在一系列连续的函数触发后，只执行一次。
--  节流: 保证在一段时间内，函数只执行一次。
-
-## 16.重绘、重排的区别？
+## 22.重绘、重排的区别？
 
 - 1.重绘不会导致页面重新渲染。
 
@@ -351,13 +530,13 @@ function throttle(fn, delay) {
 
 3.优化动画，可以把动画加在使用absolute和fixed的元素上。
 
-## 17.展开语法和解构语法
+## 23.展开语法和解构语法
 
 展开语法：主要用于“展开”数组或对象。
  
 解构赋值：主要用于从数组或对象中“提取”值或属性，并赋值给新的变量。
 
-## 18.export default和export的区别？
+## 24.export default和export的区别？
 
 - 1.export可以直接导出表达式，而export default不行。
 
@@ -365,7 +544,7 @@ function throttle(fn, delay) {
 
 - 3.在一个文件模块中，export可以有多个，而export default只有一个。
 
-## 19.闭包
+## 25.闭包
 
 - 1.定义：函数和与其相关的引用环境的组合就是闭包。
 
@@ -511,31 +690,7 @@ for (let i = 0; i < list.length; i++) {
 
 - 过度使用闭包会导致代码难以理解和维护
 
-## 20.事件循环（Event Loop） ⭐
-
-- 1.定义：因为JS是单线程执行的，所以它一次只能执行一个任务。但是它又需要一个机制来处理多个代码块的执行，也就是说js需要一种异步执行代码的机制，然后这种异步执行代码的机制就是事件循环。主线程首先执行所有的同步代码。当同步代码执行完成后，它会查看任务队列里查找有无等待的任务。如果任务队列中有等待需要被调用的函数，主线程会从队列中取出并执行它。这个过程是循环的，因此称为“事件循环”。
-
-- 2.然后放置异步代码的任务队列里的任务又会被分为宏任务和微任务。
-
-- 3.什么是宏任务和微任务？
-
-- 4.宏任务
-
-- script(整体代码)
-- setTimeout
-- setInterval
-- setImmediate
-- I/O
-- UI render
-
-- 5.微任务
-
-- process.nextTick
-- Promise.then()
-- Async/Await(实际就是promise)
-- MutationObserver(html5新特性)
-
-## 21.说一下ES6中的Proxy？
+## 26.说一下ES6中的Proxy？
 
 >Proxy对象用于创建一个对象的代理，从而实现基本的拦截和自定义（属性查找，赋值，枚举，函数调用等）。
 
@@ -554,78 +709,8 @@ let p = new Proxy(target,handler);
 >Proxy作用：用于拦截和自定义对象的一些操作。
 
 - 总结：Proxy对象用于创建一个对象的代理，从而实现对对象的一些操作，例如拦截和自定义。Vue3中就使用了Proxy代替了Vue2中的Object.defineProperty。
-
-## 22.原型和原型链 ⭐
-
-- 1.原型的定义：JS中每个对象都有一个特殊的隐藏属性，这里我们就用 [[Prototype]] 表示，你如果平常打印对象的时候也能看到这个属性，这个属性要么是null，要么是对另一个对象的引用。这个对象也称为当前对象的“原型”。
-
->tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
-
-- 2.原型链定义：因为原型本身也可能会有原型，这种关系形成一个链式结构，也就被称为原型链。
-
-- 3.作用：
-  
-- 属性查找，当视图访问一个对象的属性时，如果对象本身没有这个属性，那么js就会去这个对象的原型上去找，一直找到这条原型链的终点null。
-
-- 继承：原型链允许一个对象继承另一个对象的属性和方法。
-
-- 4.注意：
-
-- 性能：属性查找如果在原型链深处，可能会略微影响性能，因此访问本地属性总是比访问继承的属性更快。
-
-- 原型链不应该过长：过长的原型链可能会影响性能，并增加查找属性时的复杂性。
     
-## 23.call，bind，apply，apply和call哪个性能更好？
- 
-- 1.call、apply、bind都可以改变函数内部this的指向。
-
-- 2.call和apply返回的是值，而bind返回的是一个函数。
-
-- 3.call的第二参数是接收的一个参数列表，而apply的第二个参数接收的是一个数组。
-
-- 4.call的性能比apply的性能更好。
-
->这三个方法都可以改变函数内部的this的指向。
-
-```javascript
-        // 1.手写bind
-        Function.prototype.myBind = function (obj = window, ...rest) {
-            const _that = this;
-            return function () {
-                if (new.target) {
-                    return new _that([...rest, ...arguments]);
-                } else {
-                    return _that.apply(obj, [...rest, ...arguments])
-                }
-            }
-        }
-```
-
-```javascript
-        // 手写call
-        Function.prototype.myCall = function (obj = window, ...rest) {
-            obj.fn = this;
-            const res = obj.fn(...rest);
-            obj.fn = null;
-            return res;
-        }
-```
-
-```javascript
-        // 手写apply
-        Function.prototype.myApply = function (obj = window, ...rest) {
-            obj.fn = this;
-            const res = obj.fn(rest);
-            obj.fn = null;
-            return res;
-        }
-```
-
-## 24.怎么实现一个迭代器？
-
->普通对象不是可迭代类型对象，可迭代类型对象需要实现 Symbol.iterator 方法。
-    
-## 25.js中哪些情况会造成内存泄漏？
+## 27.js中哪些情况会造成内存泄漏？
     
 1.闭包使用不当可能会导致内存泄漏。
 
@@ -634,79 +719,14 @@ let p = new Proxy(target,handler);
 3.使用setTimeout和setInterval没有及时销毁。
 
 4.隐式声明的全局变量。
-    
-## 26.webworker
-    
-1.同源限制：分配给worker线程运行的脚本文件，必须与主线程的脚本文件同源
 
-2.DOM限制：worker线程不可以操作dom
-
-3.文件限制：worker线程无法读取本地文件
-
-4.通信限制：如果需要访问上下文环境需要通过消息去完成postMessage/onmessage
-
-5.脚本限制：不能用alert和confirm，可以发送ajax请求
-    
-## 27.函数柯里化 ⭐
-    
->将多个参数的一个函数转换成使用一系列一个参数的函数。
-
->也就是将fn(1,2,3,4)转换成fn(1)(2)(3)(4)
-
-```javascript
-        // 函数柯里化
-        function curry(fn) {
-            return function (a) {
-                return function (b) {
-                    return fn(a, b)
-                }
-            }
-        }
-        function A(a, b) {
-            return a + b
-        }
-        console.log(curry(A)(1)(2));
-```
-
->柯里化的好处：延迟执行，提前返回。
-    
-## 28.写出new的执行过程，并自己实现一个new函数？ ⭐
-
->new关键字的执行过程：
-
->1.创建一个空的JavaScript对象（即{}）；
-
->2.链接该对象（设置该对象的constructor）到另一个对象；
-
->3.将步骤1新创建的对象作为this的上下文；
-
->4.如果该函数没有返回**对象**，则返回this。
-
->手写一个new：
-
-```javascript
-        // 传参写法
-        function myNew(fn, ...rest) {
-            const obj = {};
-            obj.__proto__ = fn.prototype;
-            const res = fn.apply(obj, rest);
-            return res instanceof Object ? res : obj;
-        }
-```
-
-## 29.什么是事件委托和事件冒泡
+## 28.什么是事件委托和事件冒泡
     
 事件冒泡：在一个对象上触发某类事件（比如单击onclick事件），如果此对象定义了此事件的处理程序，那么此事件就会调用这个处理程序，如果没有定义此事件处理程序或者事件返回true，那么这个事件会向这个对象的父级对象传播，从里到外，直至它被处理（父级对象所有同类事件都将被激活），或者它到达了对象层次的最顶层，即document对象（有些浏览器是window）。
 
 事件委托：就是利用冒泡的原理，把事件加到父级上，通过判断事件来源的子集，执行相应的操作，事件委托首先可以极大减少事件绑定次数，提高性能；其次可以让新加入的子元素也可以拥有相同的操作。  
 
-## 30.requestAnimationFrame ⭐
-
-## 31.设计模式 ⭐
-
-- 1.工厂模式
-
-## 32.说一说JS数组中的方法？
+## 29.说一说JS数组中的方法？
 
 >总共31个。
 
@@ -730,7 +750,7 @@ let p = new Proxy(target,handler);
 
 - 10.扁平化方法：flat()、flatMap()
 
-## 33.ES Module、CommonJS
+## 30.ES Module、CommonJS
 
 - 1.  **语法**：CommonJS 使用 `require` 和 `module.exports`，而 ESM 使用 `import` 和 `export`。
 
@@ -740,9 +760,9 @@ let p = new Proxy(target,handler);
 
 - 4.  **适用场景**：CommonJS 主要用于服务器端（Node.js），而 ESM 主要用于浏览器，但现在 Node.js 也越来越支持 ESM。
 
-## 34.map 和 forEach的区别
+## 31.map 和 forEach的区别
 
-## 35.数组对象排序
+## 32.数组对象排序
 
 ```javascript
 const arr = [{ a: 1, b: 2 }, { a: 0, b: 1 }, { a: 10, b: 11 }];
@@ -752,7 +772,7 @@ console.log(arr.sort(function (a, b) {
 }));
 ```
 
-## 36.数组去重，数组对象去重。
+## 33.数组去重，数组对象去重。
 
 >1.new Set()
 
@@ -762,11 +782,11 @@ console.log(arr.sort(function (a, b) {
 
 >采用fiter，map，reduce等方法。
 
-## 37.用Promise实现一个延时？
+## 34.用Promise实现一个延时？
 
-## 38.用ES5的语法实现ES6的类？
+## 35.用ES5的语法实现ES6的类？
 
-## 39.写一个ES5的继承？
+## 36.写一个ES5的继承？
 
 ```javascript
         // 1.原型链继承
@@ -843,7 +863,7 @@ console.log(arr.sort(function (a, b) {
 
 >引用类型最佳的继承范式
 
-## 40.作用域？
+## 37.作用域
 
 >什么是作用域？作用域就是变量，函数可访问的范围。
 
@@ -851,7 +871,7 @@ console.log(arr.sort(function (a, b) {
 
 >切换作用域是消耗性能的。
 
-## 41.JS中this的指向？
+## 38.JS中this的指向
 
 1.一般情况下，this是指向调用者。如果在全局调用那就是指向window。
 
@@ -861,48 +881,12 @@ console.log(arr.sort(function (a, b) {
 
 4.在使用call和apply以及bind的时候绑定到指定的对象。
 
-## 42.立即执行函数？
+## 39.浏览器事件机制？
 
->声明一个函数并立马调用这个匿名函数就是立即执行函数。
+- 1.事件委托基于事件冒泡的原理，允许我们不直接绑定事件处理程序到每个单独的元素，而是绑定到一个共同的父元素。当该父元素的子元素触发了特定的事件时，事件处理程序会被执行。
 
->作用：1.不必为函数命名，也不会污染全局变量。 2.立即执行函数形成一个单独的作用域，可以声明一些私有变量。
+事件委托的好处：
 
->使用场景：1.将代码包裹在局部作用域中，不会让任何变量污染到全局。2.所有的动作只需要执行一次，例如某个事件。3.代码在页面加载完成之后，不得不执行一些设置工作。
-
-## 43.instanceof
-
->instanceof运算符用来检测某个构造函数的原型是否在某个对象实例的原型链上。
-
->手写一个instanceof？
-
-```javascript
-        // 手写instanceof，关键是抓住left._proto_===Right.peorotype这个等式就行
-        function myInstanceof(left, Right) {
-            left = left.__proto__;
-            Right = Right.prototype;
-            while (true) {
-                if (left === null) {
-                    return false;
-                }
-                if (left === Right) {
-                    return true;
-                }
-                left = left.__proto__;
-            }
-        }
-```
-
-## 44.js中如何判断一个数组是数组？
-
->被面到过✔✔✔✔✔。
-
->1.Array.isArray()。
-
->2.arr instanceof Array。
-
->3.arr.constructor === Array;这个利用的是构造函数原型的constructor等于构造函数本身的特性。Array.prototype.constructor === Array。
-
->4.Object.prototype.toString.call()。
-
-## 45.实现一个发布订阅系统，包括 on、emit、off 等等？
-
+- 1.性能优化: 当你有大量的子元素需要相同的事件处理时，使用事件委托可以减少事件处理程序的数量，从而提高性能。
+  
+- 2.动态元素: 对于在后期通过JavaScript动态添加到DOM的元素，你不需要为它们单独绑定事件。因为它们自然会继承父元素的事件处理。

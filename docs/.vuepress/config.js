@@ -35,8 +35,8 @@ module.exports = {
                 children: [
                     '/base/JS',
                     '/base/CSS',
-                    '/base/浏览器',
                     '/base/React',
+                    '/base/浏览器',
                     '/base/前端工程化',
                     '/base/计算机原理',
                     '/base/可视化',
@@ -50,6 +50,12 @@ module.exports = {
             {
                 title: '项目',
                 path: '/项目',
+                children: [],
+                collapsable: false,
+            },
+            {
+                title: '模拟面试',
+                path: '/模拟面试',
                 children: [],
                 collapsable: false,
             },

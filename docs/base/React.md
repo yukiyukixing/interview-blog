@@ -1,8 +1,8 @@
-# 4.React
+# 3.React
 
-## 1.React的fiber架构
+## 1.React的fiber架构 ⭐
 
-- 1.[requestIdleCallback](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback)：在浏览器空闲时间被调用，有两个参数，第一个是回调函数，第二个是timeout，在timeout毫秒后没被调用，那么将被加入事件循环中排队。
+- 1.requestIdleCallback：在浏览器空闲时间被调用，有两个参数，第一个是回调函数，第二个是timeout，在timeout毫秒后没被调用，那么将被加入事件循环中排队。
 
 - 2.react16之前的stack架构实现虚拟dom转成真实dom，是采用循环递归的方式，这个过程是不可中断的，如果你的虚拟dom树很大的话，那页面就得等待，主线程一直被占用在将虚拟dom转成真实dom，而且这个过程不可被打断。
 
