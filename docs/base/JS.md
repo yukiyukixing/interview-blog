@@ -87,11 +87,11 @@
 ```js
 function debounce(fn, delay) {
     let timer;
-    return function () {
+    return function (...args) {
         if (timer) {
             clearTimeout(timer);
         }
-        timer = setTimeout((...args) => {
+        timer = setTimeout(() => {
             fn.apply(this, args);
         }, delay)
     }
@@ -112,7 +112,7 @@ function throttle(fn, delay) {
         const now = new Date().getTime()
         if (now - lastCall >= delay) {
             lastCall = now
-            return fn.apply(this,args)
+            fn.apply(this,args)
         }
     }
 }
@@ -178,14 +178,13 @@ function throttle(fn, delay) {
 
 >手写一个new：
 
-```javascript
-        // 传参写法
-        function myNew(fn, ...rest) {
-            const obj = {};
-            obj.__proto__ = fn.prototype;
-            const res = fn.apply(obj, rest);
-            return typeof res === 'object' && res !== null ? res : obj
-        }
+```js
+function myNew(fn, ...args) {
+    const obj = {}
+    obj.__proto__ = fn.prototype
+    const res = fn.apply(obj, args)
+    return res instanceof Object ? res : obj
+}
 ```
 
 ## 9.instanceof
@@ -353,15 +352,13 @@ obs.notify("Hello World!");
  
 - 1.call、apply、bind都可以改变函数内部this的指向。
 
-- 2.call和apply返回的是值，而bind返回的是一个函数。
+- 2.bind返回的是一个函数，call和apply返回的是值。
 
-- 3.call的第二参数是接收的一个参数列表，而apply的第二个参数接收的是一个数组。
+- 3.bind和call的第二参数都是接收的一个参数列表，而apply的第二个参数接收的是一个数组。
 
 - 4.call的性能比apply的性能更好。
 
->这三个方法都可以改变函数内部的this的指向。
-
-```javascript
+```js
         // 1.手写bind
         Function.prototype.myBind = function (obj = window, ...rest) {
             const _that = this;
