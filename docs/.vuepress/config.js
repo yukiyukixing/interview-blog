@@ -1,5 +1,8 @@
 module.exports = {
     base: '/interview-blog/',
+    head: [
+        ['link', { rel: 'icon', href: '/favicon.png' }]
+    ],
     configureWebpack: {
         resolve: {
             alias: {
