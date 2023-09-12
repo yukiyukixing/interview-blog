@@ -74,5 +74,6 @@ module.exports = {
                 collapsable: false,
             }
         ]
-    }
+    },
+    dest: 'dist',
 }
