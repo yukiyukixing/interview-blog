@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/yukiyukixing/interview-blog#readme",
   "devDependencies": {
+    "@vuepress/plugin-back-to-top": "^1.9.10",
     "vuepress": "^1.9.10"
   }
 }

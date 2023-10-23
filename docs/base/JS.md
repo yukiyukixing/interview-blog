@@ -1,16 +1,12 @@
 # 1.JS
 
-## 1.浏览器中的事件循环（Event Loop） ⭐
+## 1.事件循环（Event Loop） ⭐
 
-- 1.定义：因为JS是单线程执行的，所以它一次只能执行一个任务，如果这个任务时间过长就会造成阻塞，所以JS需要一个异步执行代码的机制，然后就有了事件循环的机制。主线程首先从上到下将JS代码放到执行栈中执行，当执行到异步代码的时候，会将这部分要执行的代码放到异步的任务队列里面，如果是宏任务，就会放到宏任务队列里，如果是微任务，就会放到微任务队列里。当同步代码执行完成后，这时候执行栈为空，js引擎会先查看当前微任务队列里面有没有要执行的任务，如果有一个一个的拿出来放到执行栈中执行，执行完看当前宏任务队列里面有没有要执行的任务，有的话也一个一个的拿出来放到执行栈中执行，执行完开始执行下一个宏任务代码。这个过程是循环的，因此称为“事件循环”。
+### 浏览器中的事件循环（Event Loop）
 
-- 2.什么是宏任务和微任务？
+- 1.定义：因为JS是单线程执行的，所以它一次只能执行一个任务，如果这个任务时间过长就会造成阻塞，所以JS需要一个异步执行代码的机制，然后就有了事件循环的机制。主线程首先从上到下将JS代码放到执行栈中执行，当执行到异步代码的时候，会将这部分要执行的代码放到异步的任务队列里面，如果是宏任务，就会放到宏任务队列里，如果是微任务，就会放到微任务队列里。当同步代码执行完成后，这时候执行栈为空，js引擎会先查看当前微任务队列里面有没有要执行的任务，如果有的话一个一个的拿出来放到执行栈中执行，执行完看当前宏任务队列里面有没有要执行的任务，有的话也一个一个的拿出来放到执行栈中执行，执行完开始执行下一个宏任务代码。这个过程是循环的，因此称为“事件循环”。
 
-- 宏任务定义：宏任务是异步执行的代码块，事件循环中独立调度的一个工作单元。
-
-- 微任务定义：微任务也是异步执行的代码块，不过执行的优先级比宏任务更高。
-
-- 3.宏任务包含哪些
+- 2.宏任务包含哪些
 
 - （1）整个script标签里的代码块
 
@@ -24,11 +20,33 @@
 
 - （6）UI渲染
 
-- 5.微任务
+- 3.微任务
 
 - （1）Promise.then catch
 
 - （2）MutationObserver（监控dom树的变化）
+
+### Node中的事件循环
+
+- 1.Input/Start: 当 Node.js 进程启动时，它会初始化事件循环，然后执行传入的脚本或模块。这个脚本可能会调用一些异步 API，然后进入事件循环等待事件触发。
+
+- 2.Timers Phase: 在这个阶段，Node.js 检查计划执行的 setTimeout 和 setInterval 回调函数。
+
+- 3.Pending Callbacks Phase: 在这一阶段，系统处理某些系统操作（如 TCP 错误类型）的回调函数。
+
+- 4.Idle, Prepare Phase: 用于系统内部操作。
+
+- 5.Poll Phase: 在这里，Node.js 会检查是否有新的 I/O 事件，执行对应的回调。这个阶段允许新的定时器入队。
+
+- 6.Check Phase: 在这个阶段，setImmediate() 回调会被执行。
+
+- 7.Close Callbacks Phase: 如果存在任何 close 事件（例如 socket.on('close', ...)），则在此阶段处理这些回调。
+
+- 8.事件循环将继续执行，直到回调队列为空，然后退出。需要注意的是，在 Node.js 中，不是所有的任务都通过事件循环进行调度。某些 API，例如 fs 模块，使用了 libuv 的工作线程池来实现文件 I/O。
+
+>libuv 是 Node.js 底层的一个关键库，它为 Node.js 提供事件循环和所有的异步行为。
+
+>[参考资料](https://mp.weixin.qq.com/s/QgfE5Km1xiEkQqADMLmj-Q)
 
 ## 2.深拷贝，浅拷贝 ⭐
     
@@ -44,7 +62,7 @@
     
 >深拷贝怎么解决循环引用？
 
-解决循环引用问题，你通常需要维护一个“已访问”的对象列表。当你试图拷贝一个对象时，你首先检查这个对象是否已经被拷贝过了。如果是，你直接返回之前拷贝过的新对象的引用，而不是重新拷贝它。
+解决循环引用问题，你通常需要维护一个“已访问”的对象列表。当你试图拷贝一个对象时，你首先检查这个对象是否已经被拷贝过了。如果是，你直接返回之前拷贝过的新对象的引用，不需要重新拷贝它。
     
 ```js
         const obj = {
@@ -120,11 +138,11 @@ function throttle(fn, delay) {
 
 ## 4.原型和原型链 ⭐
 
-- 1.原型的定义：JS中每个对象都有一个特殊的隐藏属性，这里我们就用 [[Prototype]] 表示，这个属性要么是null，要么是对另一个对象的引用。这个对象也称为当前对象的“原型”。
+- 1.原型的定义：每一个JS对象（除了null）在创建的时候都会与之关联另一个对象，这个对象就是我们所说的原型。每一个对象都可以从原型继承属性。
 
 >tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
 
-- 2.原型链定义：因为原型本身也可能会有原型，这种关系形成一个链式结构，也就被称为原型链。
+- 2.原型链定义：当你试图访问一个对象的属性时，JS会首先在对象本身查找，如果没有找到，则会继续在该对象的原型上查找，然后是原型的原型，以此类推。这种由原型链接到原型的系列对象被称为原型链。
 
 - 3.作用：
   
@@ -248,11 +266,11 @@ function promiseAll(promiseArr) {
 
 ```js
 function promiseRace(promiseArr) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resovle, reject) => {
         const len = promiseArr.length
-        if (len === 0) return
-        for (let i = 0; i < len; i++) {
-            Promise.resolve(promiseArr[i]).then(resolve, reject)
+        if (len === 0) return;
+        for (let promiseItem of promiseArr) {
+            Promise.resolve(promiseItem).then(resovle, reject)
         }
     })
 }
@@ -266,13 +284,12 @@ function promiseRace(promiseArr) {
 
 ```js
 function curry(fn) {
-    const len = fn.length
     return function curryFn(...args) {
-        if (args.length >= len) {
-            return fn(...args)
+        if (args.length >= fn.length) {
+            return fn.apply(this, args)
         } else {
             return function (...newArgs) {
-                return curryFn(...args, ...newArgs)
+                return curryFn.apply(this, args.concat(newArgs))
             }
         }
     }
@@ -283,21 +300,17 @@ function curry(fn) {
 
 ## 12.设计模式 ⭐
 
-- 1.模块模式：创建私有和公共封装的方式。在ES6之前，JS没有内置的模块系统，所以模块模式成为了实现封装和避免全局作用域污染的流行方法。ES6引入了模块导入和导出。
+- 1.单例模式：保证一个类仅有一个实例，并提供一个访问它的全局访问点。
 
 ```js
-const myMoudel = (function () {
-    const name = 'Jack'
-    function getName() {
-        return name
+class Singleton {
+  constructor() {
+    if (!Singleton.instacne) {
+      Singleton.instacne = this
     }
-    return {
-        publicMethod: function () {
-            return getName() + '18'
-        }
-    }
-})()
-console.log(myMoudel.publicMethod());
+    return Singleton.instacne
+  }
+}
 ```
 
 - 2.观察者模式：也被称为发布/订阅模式。在这种模式中，一个对象（发布者）维护一系列依赖于它的对象（观察者），并在任何状态更改时自动通知它们。
@@ -323,29 +336,41 @@ obs.notify("Hello World!");
 
 - 3.工厂模式：这种模式用于创建对象，让子类决定实例化哪一个类。它提供了一个创建对象的接口，但允许子类更改将要实例化的类。
 
-- 4.单例模式：该模式确保一个类只有一个实例，并提供了一个全局访问该实例的点。
-
-- 5.原型模式：JS是基于原型的语言，所以这种模式在语言核心中已经内建。它允许你复制或克隆对象，而不是每次都从零开始创建。
+- 4.原型模式：JS是基于原型的语言，所以这种模式在语言核心中已经内建。它允许你复制或克隆对象，而不是每次都从零开始创建。
 
 ## 13.实现一个发布订阅系统 ⭐
 
 ```js
-class Observer {
-    constructor() {
-        this.listeners = []
-    }
+class EventBus {
+  constructor() {
+    this.subscribes = {}
+  }
 
-    on(listener) {
-        this.listeners.push(listener)
+  subscribe(event, callback) {
+    if (!this.subscribes[event]) {
+      this.subscribes[event] = []
     }
-    emit(data) {
-        this.listeners.forEach(listener => listener(data))
-    }
+    this.subscribes[event].push(callback)
+  }
+
+  unsubscribe(event, callback) {
+    if (!this.subscribes[event]) return
+    const index = this.subscribes[event].indexOf(callback)
+    this.subscribes[event].splice(index, 1)
+  }
+
+  publish(event, data) {
+    this.subscribes[event].forEach(item => {
+      item(data)
+    })
+  }
 }
-const obs = new Observer();
-obs.subscribe(data => console.log("Listener 1: " + data));
-obs.subscribe(data => console.log("Listener 2: " + data));
-obs.notify("Hello World!");
+const eventBus = new EventBus()
+function callback(data) {
+  console.log(`收到的数据为：${data}`);
+}
+eventBus.subscribe('event', callback)
+eventBus.publish('event', 'Hello')
 ```
 
 ## 14.call，bind，apply，apply和call哪个性能更好？
@@ -359,37 +384,37 @@ obs.notify("Hello World!");
 - 4.call的性能比apply的性能更好。
 
 ```js
-        // 1.手写bind
-        Function.prototype.myBind = function (obj = window, ...rest) {
-            const _that = this;
-            return function () {
-                if (new.target) {
-                    return new _that([...rest, ...arguments]);
-                } else {
-                    return _that.apply(obj, [...rest, ...arguments])
-                }
-            }
-        }
+// 1.手写bind
+Function.prototype.myBind = function (obj = window, ...args1) {
+  const that = this
+  return function (...args2) {
+    if (new.target) {
+      return new that(...args1, ...args2)
+    } else {
+      return that.apply(obj, [...args1, ...args2])
+    }
+  }
+}
+```
+
+```js
+// 手写call
+Function.prototype.myCall = function (obj = window, ...args) {
+  obj.fn = this
+  const res = obj.fn(...args)
+  delete obj.fn
+  return res
+}
 ```
 
 ```javascript
-        // 手写call
-        Function.prototype.myCall = function (obj = window, ...rest) {
-            obj.fn = this;
-            const res = obj.fn(...rest);
-            obj.fn = null;
-            return res;
-        }
-```
-
-```javascript
-        // 手写apply
-        Function.prototype.myApply = function (obj = window, ...rest) {
-            obj.fn = this;
-            const res = obj.fn(rest);
-            obj.fn = null;
-            return res;
-        }
+// 手写apply
+Function.prototype.myApply = function (obj = window, args) {
+  obj.fn = this
+  const res = obj.fn(...args)
+  delete obj.fn
+  return res
+}
 ```
 
 ## 15.ES6有哪些新属性？
@@ -527,13 +552,7 @@ WeakSet: 存储唯一对象值。
 
 3.优化动画，可以把动画加在使用absolute和fixed的元素上。
 
-## 23.展开语法和解构语法
-
-展开语法：主要用于“展开”数组或对象。
- 
-解构赋值：主要用于从数组或对象中“提取”值或属性，并赋值给新的变量。
-
-## 24.export default和export的区别？
+## 23.export default和export的区别？
 
 - 1.export可以直接导出表达式，而export default不行。
 
@@ -541,7 +560,7 @@ WeakSet: 存储唯一对象值。
 
 - 3.在一个文件模块中，export可以有多个，而export default只有一个。
 
-## 25.闭包
+## 24.闭包
 
 - 1.定义：函数和与其相关的引用环境的组合就是闭包。
 
@@ -645,55 +664,19 @@ console.log(addFive(4)); // 输出 9（5 + 4）
 
 >通过使用闭包和柯里化，你可以编写更灵活、更可复用的代码。这也是函数式编程中的一种常见模式。
 
-- 事件处理和回调：保留某些状态以供稍后使用。
-
-```html
-<!-- HTML部分 -->
-<ul id="myList">
-  <li>Item 1</li>
-  <li>Item 2</li>
-  <li>Item 3</li>
-</ul>
-```
-
-```js
-// 错误示例：这样做将会在每次点击时都输出最后一个索引
-const list = document.querySelectorAll('#myList li');
-for (var i = 0; i < list.length; i++) {
-  list[i].addEventListener('click', function() {
-    console.log("Clicked item index: " + i);
-  });
-}
-
-// 正确示例：使用闭包来捕获每个索引
-for (let i = 0; i < list.length; i++) {
-  list[i].addEventListener('click', (function(index) {
-    return function() {
-      console.log("Clicked item index: " + index);
-    };
-  })(i));
-}
-```
-
->在错误示例中，由于JavaScript的变量提升和异步执行，点击任何一个列表项都会输出最后一个索引。
-
->在正确示例中，我们使用了一个立即执行函数表达式（IIFE）和闭包来捕获循环中的每一个索引值。这样，当点击事件发生时，每一个列表项都能正确地访问到它自己的索引。
-
->这个简单的例子展示了如何使用闭包在事件处理和回调中保存状态，这在实际开发中是非常常见的需求。通过这种方式，你可以编写更灵活和更强大的代码。
-
 - 5.注意事项：
 
 - 闭包使用不当会导致内存泄漏
 
 - 过度使用闭包会导致代码难以理解和维护
 
-## 26.说一下ES6中的Proxy？
+## 25.说一下ES6中的Proxy？
 
 >Proxy对象用于创建一个对象的代理，从而实现基本的拦截和自定义（属性查找，赋值，枚举，函数调用等）。
 
 >语法：
 
-```javascript
+```js
 let p = new Proxy(target,handler);
 ```
 
@@ -707,7 +690,7 @@ let p = new Proxy(target,handler);
 
 - 总结：Proxy对象用于创建一个对象的代理，从而实现对对象的一些操作，例如拦截和自定义。Vue3中就使用了Proxy代替了Vue2中的Object.defineProperty。
     
-## 27.js中哪些情况会造成内存泄漏？
+## 26.js中哪些情况会造成内存泄漏？
     
 1.闭包使用不当可能会导致内存泄漏。
 
@@ -717,13 +700,13 @@ let p = new Proxy(target,handler);
 
 4.隐式声明的全局变量。
 
-## 28.什么是事件委托和事件冒泡
+## 27.什么是事件委托和事件冒泡
     
 事件冒泡：在一个对象上触发某类事件（比如单击onclick事件），如果此对象定义了此事件的处理程序，那么此事件就会调用这个处理程序，如果没有定义此事件处理程序或者事件返回true，那么这个事件会向这个对象的父级对象传播，从里到外，直至它被处理（父级对象所有同类事件都将被激活），或者它到达了对象层次的最顶层，即document对象（有些浏览器是window）。
 
 事件委托：就是利用冒泡的原理，把事件加到父级上，通过判断事件来源的子集，执行相应的操作，事件委托首先可以极大减少事件绑定次数，提高性能；其次可以让新加入的子元素也可以拥有相同的操作。  
 
-## 29.说一说JS数组中的方法？
+## 28.说一说JS数组中的方法？
 
 >总共31个。
 
@@ -747,29 +730,21 @@ let p = new Proxy(target,handler);
 
 - 10.扁平化方法：flat()、flatMap()
 
-## 30.ES Module、CommonJS
+## 29.ES Module、CommonJS
 
-- 1.  **语法**：CommonJS 使用 `require` 和 `module.exports`，而 ESM 使用 `import` 和 `export`。
+- 1.语法：CommonJS 使用 `require` 和 `module.exports`，而 ESM 使用 `import` 和 `export`。
 
-- 2.  **运行时 vs 编译时**：CommonJS 是运行时执行，而 ESM 是编译时执行。
+- 2.运行时 vs 编译时：CommonJS 是运行时执行，而 ESM 是编译时执行。
 
-- 3.  **动态 vs 静态**：CommonJS 可以动态加载模块，而 ESM 是静态的。
+- 3.动态 vs 静态：CommonJS 可以动态加载模块，而 ESM 是静态的。
 
-- 4.  **适用场景**：CommonJS 主要用于服务器端（Node.js），而 ESM 主要用于浏览器，但现在 Node.js 也越来越支持 ESM。
+- 4.适用场景：CommonJS 主要用于服务器端（Node.js），而 ESM 主要用于浏览器，但现在 Node.js 也越来越支持 ESM。
 
-## 31.map 和 forEach的区别
+## 30.map 和 forEach的区别
 
-## 32.数组对象排序
+- 1.map返回一个新数组，forEach不返回任何值。
 
-```javascript
-const arr = [{ a: 1, b: 2 }, { a: 0, b: 1 }, { a: 10, b: 11 }];
-
-console.log(arr.sort(function (a, b) {
-    return (a.a + a.b) - (b.a + b.b);
-}));
-```
-
-## 33.数组去重，数组对象去重。
+## 31.数组去重，数组对象去重。
 
 >1.new Set()
 
@@ -779,13 +754,20 @@ console.log(arr.sort(function (a, b) {
 
 >采用fiter，map，reduce等方法。
 
-## 34.用Promise实现一个延时？
+## 32.用Promise实现一个延时？
 
-## 35.用ES5的语法实现ES6的类？
+```js
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time))
+}
+delay(3000).then(() => {
+  console.log('3秒后触发');
+})
+```
 
-## 36.写一个ES5的继承？
+## 33.写一个ES5的继承？
 
-```javascript
+```js
         // 1.原型链继承
         function A() { }
         function B() { }
@@ -860,7 +842,7 @@ console.log(arr.sort(function (a, b) {
 
 >引用类型最佳的继承范式
 
-## 37.作用域
+## 34.作用域
 
 >什么是作用域？作用域就是变量，函数可访问的范围。
 
@@ -868,7 +850,7 @@ console.log(arr.sort(function (a, b) {
 
 >切换作用域是消耗性能的。
 
-## 38.JS中this的指向
+## 35.JS中this的指向
 
 1.一般情况下，this是指向调用者。如果在全局调用那就是指向window。
 
@@ -877,13 +859,3 @@ console.log(arr.sort(function (a, b) {
 3.箭头函数中的this来自于上下文。
 
 4.在使用call和apply以及bind的时候绑定到指定的对象。
-
-## 39.浏览器事件机制？
-
-- 1.事件委托基于事件冒泡的原理，允许我们不直接绑定事件处理程序到每个单独的元素，而是绑定到一个共同的父元素。当该父元素的子元素触发了特定的事件时，事件处理程序会被执行。
-
-事件委托的好处：
-
-- 1.性能优化: 当你有大量的子元素需要相同的事件处理时，使用事件委托可以减少事件处理程序的数量，从而提高性能。
-  
-- 2.动态元素: 对于在后期通过JavaScript动态添加到DOM的元素，你不需要为它们单独绑定事件。因为它们自然会继承父元素的事件处理。

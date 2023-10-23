@@ -1,5 +1,6 @@
 module.exports = {
     base: '/interview-blog/',
+    plugins: ['@vuepress/back-to-top'],
     head: [
         ['link', { rel: 'icon', href: '/favicon.png' }]
     ],

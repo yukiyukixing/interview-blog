@@ -6,11 +6,11 @@
 
 （1）创建 BFC 的条件：
 
-- 1.position设置未absolute和fixed。
+- 1.position设置为absolute和fixed。
 
 - 2.float不为none。
 
-- 3.display的inline-block或fixed。
+- 3.display为inline-block或fixed。
 
 - 4.overflow不为visible
 
