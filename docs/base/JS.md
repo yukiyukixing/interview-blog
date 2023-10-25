@@ -24,30 +24,6 @@
 
 - （1）Promise.then catch
 
-- （2）MutationObserver（监控dom树的变化）
-
-### Node中的事件循环
-
-- 1.Input/Start: 当 Node.js 进程启动时，它会初始化事件循环，然后执行传入的脚本或模块。这个脚本可能会调用一些异步 API，然后进入事件循环等待事件触发。
-
-- 2.Timers Phase: 在这个阶段，Node.js 检查计划执行的 setTimeout 和 setInterval 回调函数。
-
-- 3.Pending Callbacks Phase: 在这一阶段，系统处理某些系统操作（如 TCP 错误类型）的回调函数。
-
-- 4.Idle, Prepare Phase: 用于系统内部操作。
-
-- 5.Poll Phase: 在这里，Node.js 会检查是否有新的 I/O 事件，执行对应的回调。这个阶段允许新的定时器入队。
-
-- 6.Check Phase: 在这个阶段，setImmediate() 回调会被执行。
-
-- 7.Close Callbacks Phase: 如果存在任何 close 事件（例如 socket.on('close', ...)），则在此阶段处理这些回调。
-
-- 8.事件循环将继续执行，直到回调队列为空，然后退出。需要注意的是，在 Node.js 中，不是所有的任务都通过事件循环进行调度。某些 API，例如 fs 模块，使用了 libuv 的工作线程池来实现文件 I/O。
-
->libuv 是 Node.js 底层的一个关键库，它为 Node.js 提供事件循环和所有的异步行为。
-
->[参考资料](https://mp.weixin.qq.com/s/QgfE5Km1xiEkQqADMLmj-Q)
-
 ## 2.深拷贝，浅拷贝 ⭐
     
 - 1.深浅拷贝是针对引用类型说的，原始类型不存在深浅拷贝。
@@ -169,6 +145,8 @@ function throttle(fn, delay) {
 - 3.for...in遍历对象的时候会遍历对象原型链上面的属性。
 
 - 4.for...in一般被用来遍历对象，for...of一般被用来遍历数组。
+
+- 5.for...in迭代对象的顺序是不确定的。
 
 >tips：hasOwnProperty()方法可以判断属性是否是属于对象本身，属于的话为true，不属于为false。
 
