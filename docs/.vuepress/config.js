@@ -23,12 +23,6 @@ module.exports = {
                 children: []
             },
             {
-                title: '大纲',
-                path: '/大纲',
-                children: [],
-                collapsable: false,
-            },
-            {
                 title: '简历与自我介绍',
                 path: '/简历与自我介绍',
                 children: [],

@@ -34,8 +34,8 @@
 
 - 4.深拷贝的方式：1.JSON.parse(JSON.stringify(obj)) 2.递归 3.lodash中的_.defaultsDeep()方法。
 
->tips: 利用JSON.stringify()的缺陷，处理不了function对象、undefined以及symbol类型，原因是JSON.stringify()在处理这些类型，这些类型会被忽略，不会被处理。并且JSON.stringify()也解决不了循环引用的问题。
-    
+>tips: JSON.stringify()的缺陷，处理不了function对象、undefined以及symbol类型，原因是JSON.stringify()在处理这些类型，这些类型会被忽略，不会被处理。并且JSON.stringify()也解决不了循环引用的问题。
+
 >深拷贝怎么解决循环引用？
 
 解决循环引用问题，你通常需要维护一个“已访问”的对象列表。当你试图拷贝一个对象时，你首先检查这个对象是否已经被拷贝过了。如果是，你直接返回之前拷贝过的新对象的引用，不需要重新拷贝它。
@@ -837,3 +837,5 @@ delay(3000).then(() => {
 3.箭头函数中的this来自于上下文。
 
 4.在使用call和apply以及bind的时候绑定到指定的对象。
+
+## 36.跨域

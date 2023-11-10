@@ -262,6 +262,8 @@ forwardRef 是 React 提供的一个工具，允许组件接收并“转发”�
 
 ## 22.React18有哪些升级
 
+[官方文档](https://zh-hans.react.dev/blog/2022/03/29/react-v18)
+
 - 1.并发渲染
 
 在React18之前，所有任务都被视为急迫任务，react18引入了并发模式，在这个模式下，渲染是可以中断的，高优先级的任务可以优先渲染更新。开启并发模式只需要将之前的ReactDom.render换成ReactDom.createRoot这个新的api即可。
@@ -270,6 +272,6 @@ forwardRef 是 React 提供的一个工具，允许组件接收并“转发”�
 
 在React 18 之前，我们只在 React 事件处理函数 中进行批处理更新。默认情况下，在promise、setTimeout、原生事件处理函数中、或任何其它事件内的更新都不会进行批处理。React18之后，默认自动执行批处理，多次更新合并为一次更新。
 
-## React的渲染过程
+## 23.React的渲染过程
 
 首先我们就说react项目开发过程中运行的逻辑，首先例如你使用的是npm，启动npm run dev，这时候你的配置文件package.json中就有相对应的命令，如果你的打包工作使用的是webpack的花，运行相应的webpack命令，webpack从刚才的命令以及webpack中合并一个最终的配置参数，找到入口，一般是src文件根目录下的index.js，createRoot(document.getElementById('root')).render(<App />)
