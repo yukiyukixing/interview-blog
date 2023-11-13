@@ -47,7 +47,7 @@
         obj.quote = obj;
         function deepCopy(obj, visited = new Map()) {
             // 基础类型或 null，直接返回
-            if (obj === null || typeof obj !== 'object') {
+            if (!obj || typeof obj !== 'object') {
                 return obj
             }
             // 检查是否循环引用
@@ -55,16 +55,16 @@
                 return visited.get(obj)
             }
             // 对于数组或对象，创建一个新的空数组或对象
-            const copy = Array.isArray(obj) ? [] : {};
+            const copyObj = Array.isArray(obj) ? [] : {};
             // 将当前正在拷贝的对象加入已访问列表
-            visited.set(obj, copy);
+            visited.set(obj, copyObj);
             // 递归拷贝所有属性
             for (const key in obj) {
                 if (obj.hasOwnProperty(key)) {
-                    copy[key] = deepCopy(obj[key], visited);
+                    copyObj[key] = deepCopy(obj[key], visited);
                 }
             }
-            return copy
+            return copyObj
         }
         console.log(deepCopy(obj));
 ```
@@ -80,7 +80,7 @@
 
 ```js
 function debounce(fn, delay) {
-    let timer;
+    let timer = null;
     return function (...args) {
         if (timer) {
             clearTimeout(timer);
@@ -114,11 +114,11 @@ function throttle(fn, delay) {
 
 ## 4.原型和原型链 ⭐
 
-- 1.原型的定义：每一个JS对象（除了null）在创建的时候都会与之关联另一个对象，这个对象就是我们所说的原型。每一个对象都可以从原型继承属性。
+- 1.原型的定义：每一个除了null之外的JS对象在创建的时候都会与之关联另一个对象，这个对象就是它的原型。并且可以从这个对象继承属性和方法。
 
 >tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
 
-- 2.原型链定义：当你试图访问一个对象的属性时，JS会首先在对象本身查找，如果没有找到，则会继续在该对象的原型上查找，然后是原型的原型，以此类推。这种由原型链接到原型的系列对象被称为原型链。
+- 2.原型链定义：当你试图访问一个对象的属性时，JS会首先在对象本身查找，如果没有找到，则会继续在该对象的原型上查找，然后就是原型的原型，以此类推。这样构成的一条链路我们称之为原型链。
 
 - 3.作用：
   
