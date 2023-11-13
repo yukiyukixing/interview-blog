@@ -841,3 +841,9 @@ delay(3000).then(() => {
 ## 36.跨域
 
 ## 37.Web Workers
+
+>Web Workers通信最后处理完的数据是什么（序列化的）？哪些数据不能传？（dom，对象等）
+
+>webworker中为什么能提升js执行的性能？
+
+>你是怎么使用webworker的？
