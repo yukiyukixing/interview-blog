@@ -839,3 +839,5 @@ delay(3000).then(() => {
 4.在使用call和apply以及bind的时候绑定到指定的对象。
 
 ## 36.跨域
+
+## 37.Web Workers
