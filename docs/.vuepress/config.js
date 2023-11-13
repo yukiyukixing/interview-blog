@@ -52,14 +52,14 @@ module.exports = {
                 collapsable: false,
             },
             {
-                title: '模拟面试',
-                path: '/模拟面试',
+                title: '面经',
+                path: '/面经',
                 children: [],
                 collapsable: false,
             },
             {
-                title: '面试实战',
-                path: '/面试实战',
+                title: '面试复盘',
+                path: '/面试复盘',
                 children: [],
                 collapsable: false,
             },
