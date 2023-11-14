@@ -14,11 +14,9 @@
 
 - （3）setInterval
 
-- （4）setImmediate
+- （4）I/O操作（输入/输出）
 
-- （5）I/O操作（输入/输出）
-
-- （6）UI渲染
+- （5）UI渲染
 
 - 3.微任务
 
@@ -116,15 +114,11 @@ function throttle(fn, delay) {
 
 - 1.原型的定义：每一个除了null之外的JS对象在创建的时候都会与之关联另一个对象，这个对象就是它的原型。并且可以从这个对象继承属性和方法。
 
->tips：每个函数都有一个prototype属性，每个对象都有一个__proto__属性。
-
 - 2.原型链定义：当你试图访问一个对象的属性时，JS会首先在对象本身查找，如果没有找到，则会继续在该对象的原型上查找，然后就是原型的原型，以此类推。这样构成的一条链路我们称之为原型链。
 
-- 3.作用：
-  
-- 属性查找，当视图访问一个对象的属性时，如果对象本身没有这个属性，那么js就会去这个对象的原型上去找，一直找到这条原型链的终点null。
+- 3.对象原型：JS中所有对象的原型最终都会指向 `Object.prototype`，而 `Object.prototype` 的原型等于 `null`。
 
-- 继承：原型链允许一个对象继承另一个对象的属性和方法。
+- 4.函数原型：当函数作为对象时，它的原型是 `__proto__`，最终指向都是 `Function.prototype`。当函数作为构造函数时，它的原型是 `prototype`。
 
 ## 5.requestAnimationFrame ⭐
 
@@ -190,14 +184,14 @@ function myNew(fn, ...args) {
 >手写一个instanceof？
 
 ```js
-function myInstanceof(leftObj, rightFn) {
-    let left = leftObj.__proto__
-    const right = rightFn.prototype
+function myInstanceof(obj, fn) {
+    let left = obj.__proto__, right = fn.prototype
     while (left) {
         if (left === right) {
             return true
+        } else {
+            left = left.__proto__
         }
-        left = left.__proto__
     }
     return false
 }
@@ -205,42 +199,62 @@ function myInstanceof(leftObj, rightFn) {
 
 ## 10.Promise ⭐
 
-（1）状态：大致分为三种状态。
+- 1.什么是Promise? ⭐
 
-①：pending：待定
+JS中的Promise是一种用于处理异步操作的机制，可以更好的处理回调地狱问题。
 
-②、fullfilled：已实现
+>回调地狱：在异步编程中，多层嵌套的回调函数导致代码变得难以阅读和维护的情况。这种情况通常发生在处理多个异步操作，每个操作都依赖于前一个操作的结果时，代码中充斥着大量的回调函数。
 
-③、rejected：已拒绝
+- 2.Promise的三种状态 ⭐
 
-3、解决了什么问题？
+（1）pending：待定
 
-①、支持链式调用，解决了回调地狱的问题。
+（2）fulfilled：已兑现
 
-（2）手写一个Promise.all ⭐
+（3）rejected：已拒绝
+
+- 3.Prmise的3个实例方法 ⭐
+
+（1）then：当Promise返回的状态为成功时要执行的回调函数。
+
+（2）catch：当Promise返回的状态为失败时要执行的回调函数。
+
+（3）finally：当Promise返回的状态不管是成功还是失败时要执行的回调函数。
+
+- 4.Promise常用的6个静态方法 ⭐
+
+| 序号 | 方法名称 | 定义 |
+| :----: |:----: |:----: |
+| 1 | Promise.resolve() | 创建一个立即成功的 Promise 对象，其结果就是你给它的值。 |
+| 2 | Promise.reject() | 创建一个立即失败的 Promise 对象，其拒绝原因就是你指定的值。 |
+| 3 | Promise.all() | 接收一个 Promise 对象数组，等对象数组中的Promise全部都成功解决后，返回一个包含所有成功结果的数组，按照输入的顺序排列。 |
+| 4 | Promise.race() | 接收一个 Promise 对象数组，立即返回第一个解决的结果，不论结果是成功还是失败。 |
+| 5 | Promise.allSettled() | 接收一个Promise对象数组，等对象数组中的Promise全部都解决后，不论结果是成功还是失败都会全部返回，返回一个包含所有结果的数组，按照输入的顺序排列。 |
+| 6 | Promise.any() | 接收一个Promise对象数组，立即返回第一个成功解决的结果。如果全部失败，返回一个被拒绝的带有拒绝原因的数组。 |
+
+- 5.手写一个Promise.all ⭐
 
 ```js
 function promiseAll(promiseArr) {
     return new Promise((resolve, reject) => {
-        const res = []
-        let completed = 0
-        const len = promiseArr.length
+        const res = [], len = promiseArr.length
+        let count = 0
         for (let i = 0; i < len; i++) {
             Promise.resolve(promiseArr[i]).then(val => {
                 res[i] = val
-                completed++
-                if (completed === len) {
+                count++
+                if (count === len) {
                     resolve(res)
                 }
-            }).catch(error => {
-                reject(error)
+            }).catch(err => {
+                reject(err)
             })
         }
     })
 }
 ```
 
-（3）手写一个Promise.race
+- 6.手写一个Promise.race ⭐
 
 ```js
 function promiseRace(promiseArr) {
@@ -254,7 +268,53 @@ function promiseRace(promiseArr) {
 }
 ```
 
-## 11.函数柯里化 ⭐
+- 7.手写一个Promise.any ⭐
+
+```js
+function promiseAny(promiseArr) {
+    return new Promise((resolve, reject) => {
+        const errors = [], len = promiseArr.length
+        let count = 0;
+        for (let i = 0; i < len; i++) {
+            Promise.resolve(promiseArr[i]).then(val => {
+                resolve(val)
+            }).catch(err => {
+                errors[i] = err
+                count++
+                if (count === len) {
+                    reject(new AggregateError(errors, '所有的Promise都被拒绝'))
+                }
+            })
+        }
+    })
+}
+```
+
+## 11.async/await ⭐
+
+- 1.定义：**async/await** 是JS中处理异步操作的一种语法，是基于 **Promise** 的一种更简洁、更易读的方式。这种语法让异步代码看起来和写起来更像同步代码，从而减少了代码的复杂性。
+
+- 2.async 关键字
+
+-   **定义**：**async** 是一个放在函数定义前的关键字，它使得函数总是返回一个 **Promise**。如果函数返回的不是 **Promise**，该返回值将被自动包装在一个 **Promise** 中。
+
+-   **用法**：当你在一个函数声明前加上 **async**，这个函数就成为了一个异步函数。
+
+- 3.await 关键字
+
+-   **定义**：**await** 只能在 **async** 函数内部使用。它会暂停异步函数的执行，等待 **Promise** 的解决（fulfill）或拒绝（reject），然后继续异步函数的执行并返回解决结果。
+
+-   **用法**：**await** 后面通常跟着一个 **Promise**。它使得代码等待直到 **Promise** 解决，并返回结果。
+
+- 4.async/await优点
+
+- 1.**代码可读性**：使得异步代码更容易阅读和理解。
+
+- 2.**错误处理**：可以使用传统的 `try/catch` 块来捕获错误。
+
+- 3.**减少回调函数**：避免了 Promise 链中嵌套 `.then()` 和 `.catch()` 方法的需要。
+
+## 12.函数柯里化 ⭐
     
 >将多个参数的一个函数转换成使用一系列一个参数的函数。
 

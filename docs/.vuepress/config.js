@@ -33,10 +33,10 @@ module.exports = {
                 path: '/基础知识',
                 children: [
                     '/base/JS',
-                    '/base/CSS',
                     '/base/React',
                     '/base/前端工程化',
                     '/base/浏览器',
+                    '/base/CSS',
                     '/base/计算机原理',
                     '/base/微前端',
                     '/base/3D',
