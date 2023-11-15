@@ -314,9 +314,11 @@ function promiseAny(promiseArr) {
 
 - 3.**减少回调函数**：避免了 Promise 链中嵌套 `.then()` 和 `.catch()` 方法的需要。
 
+>await后面跟的那个函数是立即执行的，只是从下一行开始丢到微任务队列里面。
+
 ## 12.函数柯里化 ⭐
     
->将多个参数的一个函数转换成使用一系列一个参数的函数。
+- 1.定义：将多个参数的一个函数转换成使用一系列一个参数的函数。
 
 >也就是将fn(1,2,3,4)转换成fn(1)(2)(3)(4)
 
@@ -327,18 +329,24 @@ function curry(fn) {
             return fn.apply(this, args)
         } else {
             return function (...newArgs) {
-                return curryFn.apply(this, args.concat(newArgs))
+                return curryFn.apply(this, [...args, ...newArgs])
             }
         }
     }
 }
 ```
 
->柯里化的好处：延迟执行，提前返回。
+- 2.柯里化的作用和使用场景
 
-## 12.设计模式 ⭐
+（1）延迟执行：当你在不能立马获得所有参数的时候，柯里化可以让你在不同的时间点接收不同的参数，从而提高灵活性和复用性。例如你做个计算，100+200+X，你不知道第3个参数的情况下，你可以先将前2个参数传给函数，等第3个参数有了，才执行返回。
 
-- 1.单例模式：保证一个类仅有一个实例，并提供一个访问它的全局访问点。
+（2）参数复用：在你需要多次调用同一个函数，但每次调用时某些参数保持不变的情况下，通过柯里化，你可以创建预设了一些参数的新函数，这些新函数更专注于特定的任务，更易于维护和重用。
+
+## 13.设计模式 ⭐
+
+### 1.单例模式
+
+- 1.定义：保证一个类仅有一个实例，并提供一个访问它的全局访问点。
 
 ```js
 class Singleton {
@@ -351,67 +359,114 @@ class Singleton {
 }
 ```
 
-- 2.观察者模式：也被称为发布/订阅模式。在这种模式中，一个对象（发布者）维护一系列依赖于它的对象（观察者），并在任何状态更改时自动通知它们。
+- 2.优点：
+
+（1）唯一实例：单例模式确保一个类只有一个实例，避免重复创建资源。
+
+（2）共享资源：由于只存在一个实例，所以它可以方便的共享数据，使得数据的访问和操作更为集中和一致。
+
+### 2.观察者模式
+
+- 1.定义：观察者模式用于在对象之间建立一种一对多的依赖关系，这样当一个对象的状态发生变化时，所有依赖于它的对象都会得到通知并自动更新。
 
 ```js
-class Observer {
+class Subject {
     constructor() {
-        this.listeners = []
+        this.obervers = []
     }
-
-    on(listener) {
-        this.listeners.push(listener)
+    subscribe(obs) {
+        this.obervers.push(obs)
     }
-    emit(data) {
-        this.listeners.forEach(listener => listener(data))
+    unsubscribe(obs) {
+        this.obervers = this.obervers.filter(item => item !== obs)
+    }
+    nofity(data) {
+        this.obervers.forEach(obs => {
+            obs.update(data)
+        })
     }
 }
-const obs = new Observer();
-obs.subscribe(data => console.log("Listener 1: " + data));
-obs.subscribe(data => console.log("Listener 2: " + data));
-obs.notify("Hello World!");
+class Observer {
+    constructor(name) {
+        this.name = name
+    }
+    update(data) {
+        console.log(`${this.name}收到的数据：${data}`);
+    }
+}
+const sub = new Subject()
+
+const obs1 = new Observer('obs1')
+const obs2 = new Observer('obs2')
+sub.subscribe(obs1)
+sub.subscribe(obs2)
+sub.nofity('Hello')
+sub.unsubscribe(obs1)
+sub.nofity('JS')
 ```
 
-- 3.工厂模式：这种模式用于创建对象，让子类决定实例化哪一个类。它提供了一个创建对象的接口，但允许子类更改将要实例化的类。
+### 3.发布订阅模式
 
-- 4.原型模式：JS是基于原型的语言，所以这种模式在语言核心中已经内建。它允许你复制或克隆对象，而不是每次都从零开始创建。
-
-## 13.实现一个发布订阅系统 ⭐
+- 1.定义：发布订阅模式是一种消息通信模式，用于在系统的不同部分之间传递特定的事件信息。这种模式类似于广播：一个发布者发送消息，但并不知道谁将接收它；其他订阅者可以订阅这些消息并对它们作出响应，而无需知道是哪个发布者发布了这些消息。
 
 ```js
-class EventBus {
-  constructor() {
-    this.subscribes = {}
-  }
-
-  subscribe(event, callback) {
-    if (!this.subscribes[event]) {
-      this.subscribes[event] = []
+class PubSub {
+    constructor() {
+        this.subscribers = {}
     }
-    this.subscribes[event].push(callback)
-  }
-
-  unsubscribe(event, callback) {
-    if (!this.subscribes[event]) return
-    const index = this.subscribes[event].indexOf(callback)
-    this.subscribes[event].splice(index, 1)
-  }
-
-  publish(event, data) {
-    this.subscribes[event].forEach(item => {
-      item(data)
-    })
-  }
+    // 订阅
+    subscribe(topic, callback) {
+        if (!this.subscribers[topic]) {
+            this.subscribers[topic] = []
+        }
+        this.subscribers[topic].push(callback)
+        return () => {
+            this.unsubscribe(topic, callback)
+        }
+    }
+    // 取消订阅
+    unsubscribe(topic, callback) {
+        if (this.subscribers[topic]) {
+            this.subscribers[topic] = this.subscribers[topic].filter(item => item !== callback)
+        }
+    }
+    // 发布
+    publish(topic, data) {
+        if (this.subscribers[topic]) {
+            this.subscribers[topic].forEach(cb => {
+                cb(data)
+            })
+        }
+    }
 }
-const eventBus = new EventBus()
-function callback(data) {
-  console.log(`收到的数据为：${data}`);
-}
-eventBus.subscribe('event', callback)
-eventBus.publish('event', 'Hello')
+const pubSub = new PubSub()
+const subscribe = pubSub.subscribe('news', data => console.log(`收到的信息：${data}`))
+pubSub.publish('news', 'hello')
+subscribe()
+pubSub.publish('news', 'hello')
 ```
 
-## 14.call，bind，apply，apply和call哪个性能更好？
+- 2.观察者模式和发布订阅模式有什么区别？
+
+（1）观察者模式
+
+- 直接通信：在观察者模式中，被观察者与观察者直接通信。
+
+- 依赖关系：观察者与被观察者有明确的依赖关系。观察者需要明确地注册到特定的被观察者身上。
+
+（2）发布订阅模式
+
+- 间接通信：在发布订阅模式中，发布者与订阅者不直接交互。发布者发布消息到一个中间层，订阅者订阅这些通道或主题，而不是订阅发布者。
+
+- 解耦关系：发布者和订阅者之间耦合度更低，它们不需要知道对方的存在。
+
+## 14.JS数据类型 ⭐
+    
+- 1.原始类型：number、boolean、null、undefined、string、Symbol、BigInt
+
+- 2.引用类型：Object
+
+## 15.call，bind，apply，apply和call哪个性能更好？
  
 - 1.call、apply、bind都可以改变函数内部this的指向。
 
@@ -422,16 +477,12 @@ eventBus.publish('event', 'Hello')
 - 4.call的性能比apply的性能更好。
 
 ```js
-// 1.手写bind
-Function.prototype.myBind = function (obj = window, ...args1) {
-  const that = this
-  return function (...args2) {
-    if (new.target) {
-      return new that(...args1, ...args2)
-    } else {
-      return that.apply(obj, [...args1, ...args2])
-    }
-  }
+// 手写apply
+Function.prototype.myApply = function (obj = window, args = []) {
+  obj.fn = this
+  const res = obj.fn(...args)
+  delete obj.fn
+  return res
 }
 ```
 
@@ -445,17 +496,7 @@ Function.prototype.myCall = function (obj = window, ...args) {
 }
 ```
 
-```javascript
-// 手写apply
-Function.prototype.myApply = function (obj = window, args) {
-  obj.fn = this
-  const res = obj.fn(...args)
-  delete obj.fn
-  return res
-}
-```
-
-## 15.ES6有哪些新属性？
+## 16.ES6有哪些新属性？
 
 - 1.let和const
 
@@ -477,7 +518,7 @@ Function.prototype.myApply = function (obj = window, args) {
 
 - 10.Proxy
 
-## 16.let、var、const的区别
+## 17.let、var、const的区别
     
 1.let不能重复定义变量，而var可以
 
@@ -486,12 +527,6 @@ Function.prototype.myApply = function (obj = window, args) {
 3.var声明的变量会挂载到window下面，而let不会挂到window下面，而是形成一个块级作用域。
 
 4.const定义的是常量，定义之后就不可更改，而且初始化的时候必须赋值，其他和let一样。
-
-## 17.JS数据类型
-    
-- 1.原始类型：number、boolean、null、undefined、string、Symbol、BigInt
-
-- 2.引用类型：Object
 
 ## 18.Map和Object的区别
 
@@ -598,7 +633,7 @@ WeakSet: 存储唯一对象值。
 
 - 3.在一个文件模块中，export可以有多个，而export default只有一个。
 
-## 24.闭包
+## 24.闭包 ⭐
 
 - 1.定义：函数和与其相关的引用环境的组合就是闭包。
 
@@ -608,7 +643,7 @@ WeakSet: 存储唯一对象值。
 
 - 4.闭包的作用：
 
-- 数据封装和私有变量：闭包可以用来模拟私有变量，提供公开的API而隐藏内部实现细节。
+（1）数据封装和私有变量：闭包可以用来模拟私有变量，提供公开的API而隐藏内部实现细节。
 
 ```js
 function createCounter() {
@@ -644,7 +679,7 @@ console.log(counter.count); // 输出 undefined，因为count是私有变量，�
 
 >这种方式提供了一种封装内部实现细节的机制，你可以自由地改变内部的实现而不影响到外部代码，增加了代码的可维护性和安全性。
 
-- 动态生成函数：根据不同的参数或条件生成具有特定行为的函数。
+（2）动态生成函数：根据不同的参数或条件生成具有特定行为的函数。
 
 ```js
 function greeting(language) {
@@ -677,31 +712,6 @@ console.log(greetInChinese('张三')); // 输出 "你好, 张三！"
 
 >通过这样的方式，你可以创建一个非常灵活和可配置的函数，用于处理各种不同的场景和需求。
 
-- 函数柯里化：使用闭包逐步传递少量参数。
-
-```js
-// 普通的加法函数
-function add(a, b) {
-  return a + b;
-}
-
-// 柯里化的加法函数
-function curriedAdd(a) {
-  return function(b) {
-    return a + b;
-  };
-}
-
-// 使用
-const addFive = curriedAdd(5); // 此时，addFive 是一个闭包，保存了 a 的值为 5
-console.log(addFive(3)); // 输出 8（5 + 3）
-console.log(addFive(4)); // 输出 9（5 + 4）
-```
-
->在上面的例子中，curriedAdd 函数接受一个参数 a，然后返回一个新的函数，这个新函数期望接受第二个参数 b。这里就产生了一个闭包，因为返回的函数能够“记住”第一个参数 a。
-
->通过使用闭包和柯里化，你可以编写更灵活、更可复用的代码。这也是函数式编程中的一种常见模式。
-
 - 5.注意事项：
 
 - 闭包使用不当会导致内存泄漏
@@ -722,11 +732,9 @@ let p = new Proxy(target,handler);
 
 >Proxy本质上是一个构造函数。
 
->Proxy.revocable()用来创建一个可撤销的Proxy对象，撤销方法revoke()。
-
 >Proxy作用：用于拦截和自定义对象的一些操作。
 
-- 总结：Proxy对象用于创建一个对象的代理，从而实现对对象的一些操作，例如拦截和自定义。Vue3中就使用了Proxy代替了Vue2中的Object.defineProperty。
+- 总结：Proxy对象用于创建一个对象的代理，从而实现对对象的一些操作，例如拦截和自定义。
     
 ## 26.js中哪些情况会造成内存泄漏？
     
@@ -780,9 +788,9 @@ let p = new Proxy(target,handler);
 
 ## 30.map 和 forEach的区别
 
-- 1.map返回一个新数组，forEach不返回任何值。
+- map返回一个新数组，forEach不返回任何值。
 
-## 31.数组去重，数组对象去重。
+## 31.数组去重，数组对象去重 ⭐
 
 >1.new Set()
 
@@ -790,9 +798,9 @@ let p = new Proxy(target,handler);
 
 >3.利用indexOf。
 
->采用fiter，map，reduce等方法。
-
 ## 32.用Promise实现一个延时？
+
+>可以实现sleep的效果。
 
 ```js
 function delay(time) {
@@ -805,88 +813,56 @@ delay(3000).then(() => {
 
 ## 33.写一个ES5的继承？
 
+- 1.原型链继承
+
 ```js
-        // 1.原型链继承
-        function A() { }
-        function B() { }
-        B.prototype = new A();
+function A() { }
+function B() { }
+B.prototype = new A();
 ```
 
 >缺点：引用类型所有属性被实例共享。
 
-```javascript
-        // 2.盗用构造函数继承
-        function A() { }
-        function B() {
-            A.call(this);
-        }
+- 2.盗用构造函数继承
+
+```js
+function A() { }
+function B() {
+    A.call(this);
+}
 ```
 
 >方法都在构造函数中定义，每次创建实例都会创建一遍方法。
 
-```javascript
-        // 3.组合继承
-        function A() { }
-        function B() {
-            A.call(this);
-        }
-        B.prototype = new A();
+- 3.组合继承
+
+```js
+function A() { }
+function B() {
+    A.call(this);
+}
+B.prototype = new A();
 ```
 
 >融合了上面2种模式的优点，是JS种最常用的继承方式。
 
-```javascript
-        // 4.原型式继承
-        function A(o) {
-            function F() { }
-            F.prototype = o;
-            return new F();
-        }
+- 4.原型式继承
+
+```js
+function A(o) {
+    function F() { }
+    F.prototype = o;
+    return new F();
+}
 ```
 
 >所有实例会共享引用类型属性
 
-```javascript
-        // 5.寄生式继承
-        function A(o) {
-            const clone = Object.create(o);
-            clone.sayName = function () {
-                console.log('小王');
-            }
-            return clone;
-        }
-```
-
->缺点：每次创建实例的时候，方法都会被重新创建一遍。
-
-```javascript
-        // 6.寄生式组合继承
-        function object(o) {
-            function F() { };
-            F.prototype = 0;
-            return new F();
-        }
-        function inheritPrototype(B, A) {
-            const prototype = object(A.prototype);
-            prototype.constructor = B;
-            B.prototype = prototype;
-        }
-        function A() { }
-        function B() {
-            A.call(this);
-        }
-        inheritPrototype(B, A);
-```
-
->引用类型最佳的继承范式
-
-## 34.作用域
+## 34.作用域 ⭐
 
 >什么是作用域？作用域就是变量，函数可访问的范围。
 
 >什么是作用域链？js引擎在运行的时候，查找变量的时候会从当前执行作用域逐级向外查找，形成一条链状结构，就是作用域链。
-
->切换作用域是消耗性能的。
 
 ## 35.JS中this的指向
 
@@ -898,12 +874,51 @@ delay(3000).then(() => {
 
 4.在使用call和apply以及bind的时候绑定到指定的对象。
 
-## 36.跨域
+## 36.跨域 ⭐
 
-## 37.Web Workers
+- 1.定义：跨域问题是由浏览器的同源策略引起的。同源策略是一种安全机制，如果两个页面的协议、域名或端口其中之一不同，则它们被认为是不同的源。
 
->Web Workers通信最后处理完的数据是什么（序列化的）？哪些数据不能传？（dom，对象等）
+- 2.如何解决跨域问题？
 
->webworker中为什么能提升js执行的性能？
+（1）CORS(跨资源共享)：服务器端设置‘Access-Control-Allow-Origin’，允许跨域。
 
->你是怎么使用webworker的？
+（2）JSONP：利用 script 标签不受同源策略限制的特性来实现跨域请求。
+
+（3）Nginx代理：相当于nginx在中间做了一次转发。
+
+```base
+location /api {
+   proxy_pass http://11.11.22.33:8001;
+}
+```
+
+（4）开发环境中可以使用Webpack配置代理解决跨域问题
+
+```js
+devServer: {
+  proxy: {
+    '/api': {
+      target: 'http://api.example.com',
+      pathRewrite: { '^/api': '' },
+      changeOrigin: true,
+      secure: false,
+    },
+  },
+}
+```
+
+## 37.Web Worker ⭐
+
+- 1.Web Worker通信最后处理完的数据是什么（序列化的）？
+
+- Web Worker传递的数据是经过序列化的。
+
+- 传递给 Worker 的数据是复制而不是共享的。这意味着数据在传递过程中会被复制，主线程和 Worker 之间的数据不是共享状态。
+
+- 由于数据是复制的，传递大量数据可能会导致性能问题。对于大数据量的场景，考虑使用 Transferable 对象（如 ArrayBuffer），这种方式允许数据被转移而不是复制，但转移后原来的上下文将无法再使用该数据。
+
+- 2.Web Worker哪些数据不能传？
+
+- Web Worker不能操作Dom节点
+
+- Web Worker也不能操作某些浏览器的内置对象，例如Window、Document等
