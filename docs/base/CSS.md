@@ -1,20 +1,22 @@
-# 2.CSS
+# 5.CSS
 
 ## 1.BFC ⭐
 
-- BFC：块级格式上下文
+- 1.定义：块级格式上下文，它是页面中的一块渲染区域，具有一定的渲染规则，决定了其中子元素的布局方式和与其他元素的相互作用和关系。
 
-（1）创建 BFC 的条件：
+### 1.如何创建 BFC
 
-- 1.position设置为absolute和fixed。
+- 1.根元素（<html>）本身就是一个 BFC。
 
-- 2.float不为none。
+- 2.浮动元素（元素的 float 不是 none）。
 
-- 3.display为inline-block或fixed。
+- 3.绝对定位元素（元素的 position 为 absolute 或 fixed）。
 
-- 4.overflow不为visible
+- 4.Display：inline-block、table-cells 和 table-caption。
 
-（2）应用：
+- 5.Overflow：除了 visible 以外的 overflow 值（hidden、auto、scroll）。
+
+### 2.BFC 的应用
 
 - 1.清除内部浮动：当内部有浮动元素时，可以设置父元素为BFC，避免高度塌陷。
 
@@ -203,13 +205,23 @@
 </html>
 ```
 
-## 3.盒模型
+## 3.position有哪些属性？
+
+- 1.static（默认值）：没有定位，元素出现在正常的文档流中。
+
+- 2.relative：元素相对于其正常位置进行定位。
+
+- 3.absolute：元素脱离正常文档流，并相对于最近的已定位（非 static）祖先元素进行定位。
+
+- 4.fixed：元素脱离正常文档流，并相对于浏览器窗口进行定位。
+
+## 4.盒模型
 
 - 1.标准盒模型大小：width+padding+border，box-sizing默认值content-box是标准盒模型。
 
 - 2.ie盒模型大小：width，content = width - padding - border，box-sizing: border-box
 
-## 4.水平垂直居中
+## 5.水平垂直居中
 
 ```html
 <!DOCTYPE html>
@@ -250,13 +262,3 @@
 
 </html>
 ```
-
-## 5.position有哪些属性？
-
-- 1.static（默认值）：没有定位，元素出现在正常的文档流中。
-
-- 2.relative：生成相对定位元素，相对于其正常位置进行定位。
-
-- 3.absolute：相对于最近的非static父元素进行定位。
-
-- 4.fixed：相对于浏览器窗口进行定位。

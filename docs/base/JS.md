@@ -922,3 +922,13 @@ devServer: {
 - Web Worker不能操作Dom节点
 
 - Web Worker也不能操作某些浏览器的内置对象，例如Window、Document等
+
+## 38.get和post区别？
+
+- 1.get传参通过url地址传递，post传参方式url不可见
+
+- 2.post更加的安全
+
+- 3.get请求可以被缓存，post不可以被缓存
+
+- 4.get请求有长度限制，因为URL长度是限制的，post请求没有长度限制。
