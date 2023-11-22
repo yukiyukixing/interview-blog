@@ -42,6 +42,7 @@ module.exports = {
                     '/base/3D',
                     '/base/2D',
                     '/base/算法',
+                    '/base/场景题',
                 ],
                 collapsable: true,
             },
