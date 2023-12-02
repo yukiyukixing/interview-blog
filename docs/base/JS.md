@@ -942,3 +942,19 @@ devServer: {
 - 3.get请求可以被缓存，post不可以被缓存
 
 - 4.get请求有长度限制，因为URL长度是限制的，post请求没有长度限制。
+
+## 拓展
+
+### 1.JS中数组的截取方法和字符串的截取方法
+
+| 类型 | 方法名 | 描述 | 返回值 | 是否改变原实例 |
+| :----: | :----: | :----: | :----: | :----: |
+| 数组 | splice(index,howmany,index) | 向/从数组中添加/删除项目 | 返回被删除元素的组成的数组 | 是 |
+| 数组 | slice(start,end)  | 可提取数组的某个部分，包含start，不包含end | 以新数组的形式返回被提取的部分 | 否 |
+| 字符串 | slice(start,end) | 可截取字符串的某个部分，包含start，不包含end | 返回被截取的字符串 | 否 |
+| 字符串 | substring(start,end) | 返回从 start 到 end（不包括 end）的子字符串。 |返回被截取的字符串 | 否 |
+| 字符串 | substr(start,length) | 返回从 start 开始的长度为 length 的子字符串。在现代 JS 中不推荐使用，可能在将来被弃用。 | 返回被截取的字符串 | 否 |
+
+- slice 和 substring 在处理字符串时相似，但 substring 不接受负数索引。
+- substr 方法虽然在很多环境中仍可用，但已经被 ECMAScript 2015 (ES6) 弃用，并且可能在未来的 JavaScript 版本中被移除。
+- splice 仅适用于数组，它可以在数组中添加或移除元素，并直接修改原数组。

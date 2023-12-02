@@ -12,9 +12,9 @@
 
 - 3.绝对定位元素（元素的 position 为 absolute 或 fixed）。
 
-- 4.Display：inline-block、table-cells 和 table-caption。
+- 4.Display：inline-block。
 
-- 5.Overflow：除了 visible 以外的 overflow 值（hidden、auto、scroll）。
+- 5.Overflow：overflow设置为不为 visible 的值（hidden、auto、scroll）。
 
 ### 2.BFC 的应用
 
@@ -150,7 +150,9 @@
 
 ## 2.flex:1 ⭐
 
-- 定义：flex: 1 是 flex-grow:1, flex-shrink:2, 和 flex-basis:0% 这三个属性的简写。
+>当你在一个 flex 容器中的多个子元素上使用 flex: 1 时，这些元素将平均分配容器的空间，不管它们的原始大小如何。
+
+- 定义：flex: 1 是 flex-grow:1, flex-shrink:1, 和 flex-basis:0% 这三个属性的简写。
 
 - 1.flex-grow：定义了在 flex 容器中分配剩余空间的相对比例
 
@@ -207,7 +209,7 @@
 
 ## 3.position有哪些属性？
 
-- 1.static（默认值）：没有定位，元素出现在正常的文档流中。
+- 1.static（默认值）：没有定位，元素出现在正常的文档流中。不受 top, bottom, left, right 和 z-index 属性影响。
 
 - 2.relative：元素相对于其正常位置进行定位。
 
@@ -217,9 +219,9 @@
 
 ## 4.盒模型
 
-- 1.标准盒模型大小：width+padding+border，box-sizing默认值content-box是标准盒模型。
+- 1.标准盒模型大小：width = width+padding+border，box-sizing:content-box。
 
-- 2.ie盒模型大小：width，content = width - padding - border，box-sizing: border-box
+- 2.ie盒模型大小：width = width，content = width - padding - border，box-sizing: border-box。
 
 ## 5.水平垂直居中
 
