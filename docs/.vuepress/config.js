@@ -2,7 +2,18 @@ module.exports = {
     base: '/interview-blog/',
     plugins: ['@vuepress/back-to-top'],
     head: [
-        ['link', { rel: 'icon', href: '/favicon.png' }]
+        ['link', { rel: 'icon', href: '/favicon.png' }],
+        [
+            "script",
+            {},
+            `
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "ld1lb1mxcw");
+            `
+        ]
     ],
     configureWebpack: {
         resolve: {
