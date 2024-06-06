@@ -958,3 +958,7 @@ devServer: {
 - slice 和 substring 在处理字符串时相似，但 substring 不接受负数索引。
 - substr 方法虽然在很多环境中仍可用，但已经被 ECMAScript 2015 (ES6) 弃用，并且可能在未来的 JavaScript 版本中被移除。
 - splice 仅适用于数组，它可以在数组中添加或移除元素，并直接修改原数组。
+
+### 如果觉得不错的话，可以请支持作者一下，以支持此网站的运营费用：域名的费用。
+
+![域名费.jpg](@images/domainName.jpg)
